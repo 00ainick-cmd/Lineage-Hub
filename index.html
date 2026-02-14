@@ -242,10 +242,7 @@ section{margin-bottom:1rem}
 <!-- Family Filter Pills -->
 <div class="family-pills" id="familyPills">
 <div class="family-pill active" data-family="all">ALL <span class="count" id="pill-count-all"></span></div>
-<div class="family-pill" data-family="brown">BROWN <span class="count" id="pill-count-brown"></span></div>
-<div class="family-pill" data-family="chaney">CHANEY <span class="count" id="pill-count-chaney"></span></div>
-<div class="family-pill" data-family="crawley">CRAWLEY <span class="count" id="pill-count-crawley"></span></div>
-<div class="family-pill" data-family="hess">HESS <span class="count" id="pill-count-hess"></span></div>
+<!-- Pills generated dynamically from database -->
 </div>
 </section>
 
@@ -337,11 +334,7 @@ section{margin-bottom:1rem}
 (function(){
 
 /* ── State ── */
-const KNOWN_LINES = ['brown','chaney','crawley','hess'];
 let families = {};
-KNOWN_LINES.forEach(l => {
-  families[l] = { name:l.toUpperCase(), individuals:0, sources:0, completeness:0, brickWalls:0, active:false, people:[] };
-});
 
 let allIndividuals = []; // flat list for search
 let dashboardCounts = { individuals:0, sources:0, claims:0, brickWalls:0 };
@@ -351,9 +344,7 @@ const statusEl = createConnectionIndicator();
 /* ── Rendering ── */
 function renderFamilyCards() {
   const el = document.getElementById('family-cards');
-  const linesToShow = selectedFamily === 'all' ? KNOWN_LINES : [selectedFamily];
-  // Also show any extra lines found in DB
-  const allLines = [...new Set([...KNOWN_LINES, ...Object.keys(families)])];
+  const allLines = Object.keys(families).filter(k => families[k].active);
   const visibleLines = selectedFamily === 'all' ? allLines : [selectedFamily];
   
   document.getElementById('family-section-title').textContent = 
@@ -401,6 +392,26 @@ function renderFamilyCards() {
         ${individualsHTML}
       </div>`;
   }).join('');
+  
+  // When ALL is selected, show a browsable people list below the cards
+  if (selectedFamily === 'all' && allIndividuals.length) {
+    const sorted = [...allIndividuals].sort((a,b) => ((a.surname||'')+(a.given_name||'')).localeCompare((b.surname||'')+(b.given_name||'')));
+    el.innerHTML += `<div style="grid-column:1/-1;margin-top:1rem">
+      <h3 style="font-family:'Playfair Display',serif;color:var(--gold);margin-bottom:.75rem;font-size:1.1rem">👥 Browse All People (${sorted.length})</h3>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:.5rem">
+        ${sorted.slice(0,50).map(p => {
+          const name = [p.given_name, p.middle_name, p.surname].filter(Boolean).join(' ') || 'Unknown';
+          const line = (p.family_line||'').toUpperCase();
+          const years = [p.birth_year, p.death_year].filter(Boolean).join('–');
+          return `<a href="person.html?id=${p.id}" style="display:flex;justify-content:space-between;align-items:center;padding:.5rem .75rem;background:var(--surface);border:1px solid var(--surface-border);border-radius:6px;text-decoration:none;color:var(--parchment);transition:border-color .2s" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--surface-border)'">
+            <div><div style="font-weight:500;font-size:.9rem">${esc(name)}</div>${years?`<div style="font-size:.75rem;color:var(--parchment-dim)">${years}</div>`:''}</div>
+            <span style="font-size:.65rem;padding:2px 6px;border-radius:3px;background:rgba(197,150,12,0.15);color:var(--gold-dim)">${line}</span>
+          </a>`;
+        }).join('')}
+        ${sorted.length > 50 ? `<div style="grid-column:1/-1;text-align:center;padding:.75rem;color:var(--parchment-dim);font-size:.85rem">Use search above to find more (${sorted.length - 50} not shown)</div>` : ''}
+      </div>
+    </div>`;
+  }
 }
 
 function renderStats() {
@@ -423,9 +434,29 @@ function renderStats() {
 function renderPillCounts() {
   const totalEl = document.getElementById('pill-count-all');
   if (totalEl) totalEl.textContent = dashboardCounts.individuals ? `(${dashboardCounts.individuals})` : '';
-  KNOWN_LINES.forEach(l => {
-    const el = document.getElementById('pill-count-' + l);
-    if (el) el.textContent = families[l].individuals ? `(${families[l].individuals})` : '';
+  
+  // Dynamically build pills from actual data
+  const container = document.getElementById('familyPills');
+  const existing = container.querySelectorAll('.family-pill:not([data-family="all"])');
+  existing.forEach(e => e.remove());
+  
+  const sortedLines = Object.entries(families)
+    .filter(([k,v]) => v.active && v.individuals > 0)
+    .sort((a,b) => b[1].individuals - a[1].individuals);
+  
+  sortedLines.forEach(([line, f]) => {
+    const pill = document.createElement('div');
+    pill.className = 'family-pill' + (selectedFamily === line ? ' active' : '');
+    pill.dataset.family = line;
+    pill.innerHTML = `${f.name} <span class="count">(${f.individuals})</span>`;
+    pill.addEventListener('click', () => {
+      container.querySelectorAll('.family-pill').forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      selectedFamily = line;
+      renderFamilyCards();
+      renderStats();
+    });
+    container.appendChild(pill);
   });
 }
 
@@ -597,15 +628,13 @@ async function loadData() {
 }
 
 /* ── Events ── */
-// Family pills
-document.querySelectorAll('.family-pill').forEach(pill => {
-  pill.addEventListener('click', () => {
-    document.querySelectorAll('.family-pill').forEach(p => p.classList.remove('active'));
-    pill.classList.add('active');
-    selectedFamily = pill.dataset.family;
-    renderFamilyCards();
-    renderStats();
-  });
+// ALL pill click handler (dynamic pills get handlers in renderPillCounts)
+document.querySelector('.family-pill[data-family="all"]').addEventListener('click', () => {
+  document.querySelectorAll('.family-pill').forEach(p => p.classList.remove('active'));
+  document.querySelector('.family-pill[data-family="all"]').classList.add('active');
+  selectedFamily = 'all';
+  renderFamilyCards();
+  renderStats();
 });
 
 setupSearch();
