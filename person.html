@@ -208,11 +208,21 @@ async function loadFromSupabase() {
   const { data: claims, error: ce } = await db.from('claims').select('*').eq('individual_id', personId);
   if (ce) throw ce;
 
+  // Fetch events linked via claims OR matching person ID pattern
   const eventIds = claims.filter(c => c.event_id).map(c => c.event_id);
   let events = [];
   if (eventIds.length) {
     const { data: evts } = await db.from('events').select('*').in('id', eventIds);
     if (evts) events = evts;
+  }
+  // Also fetch events whose ID contains this person's ID stem (e.g. evt_raymond_*)
+  const idStem = personId.replace(/^ind_/, '').split('_')[0]; // "raymond" from "ind_raymond_mb"
+  if (idStem) {
+    const { data: patternEvts } = await db.from('events').select('*').like('id', `evt_${idStem}%`);
+    if (patternEvts) {
+      const existingIds = new Set(events.map(e => e.id));
+      events = [...events, ...patternEvts.filter(e => !existingIds.has(e.id))];
+    }
   }
 
   // Fetch relationships
@@ -270,7 +280,7 @@ async function loadFromJSON() {
     id: c.claim_id,
     individual_id: c.individual_id,
     claim_type: c.attribute,
-    claim_value: c.value,
+    claim_value: c.value, value_normalized: c.value, value_raw: c.value,
     source_id: c.source_id,
     event_id: null,
     evidence_text: c.evidence,
@@ -407,7 +417,7 @@ async function init(){
 
     // Claims-based narrative additions
     const occClaim = claims.find(c => c.claim_type === 'occupation');
-    if (occClaim) parts.push(`<span class="unverified">${name} worked as a ${esc(occClaim.claim_value.toLowerCase())}.</span>`);
+    if (occClaim) parts.push(`<span class="unverified">${name} worked as a ${esc((occClaim.value_normalized || occClaim.value_raw || occClaim.claim_value || '').toLowerCase())}.</span>`);
 
     if (deathEvt) parts.push(`<span class="unverified">${name} died ${eventDateStr(deathEvt)}${deathEvt.place_original ? ' in ' + deathEvt.place_original : ''}.</span>`);
 
@@ -419,7 +429,7 @@ async function init(){
     let rows = claims.map(c => {
       const src = getSource(sources, c.source_id);
       const label = (c.claim_type || '').replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-      let value = c.claim_value || '';
+      let value = c.value_normalized || c.value_raw || c.claim_value || '';
       const related = getRelated(relatedPersons, value);
       if (related) value = fullName(related);
       return `<tr><td style="color:var(--gold);font-weight:500">${esc(label)}</td><td>${esc(value)}</td><td>${src ? esc(src.title) : '—'}</td><td>${badge(c.confidence)}</td></tr>`;
@@ -467,13 +477,13 @@ async function init(){
       const storageKey = `claim_note_${c.id}`;
       const savedNote = localStorage.getItem(storageKey) || '';
       return `<div class="claim-card">
-        <div class="claim-text">${esc((c.claim_type || '').replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()))}: ${esc(c.claim_value)}</div>
+        <div class="claim-text">${esc((c.claim_type || '').replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()))}: ${esc(c.value_normalized || c.value_raw || c.claim_value || '')}</div>
         <div class="claim-meta">
           <div>Source: ${src ? `<a href="#">${esc(src.title)}</a>` : 'None'}</div>
           <div>Confidence: ${badge(c.confidence)}</div>
           ${c.gps_score ? `<div>GPS Score: ${c.gps_score}</div>` : ''}
         </div>
-        ${c.evidence_text ? `<div class="claim-evidence">${esc(c.evidence_text)}</div>` : ''}
+        ${(c.quote || c.evidence_text) ? `<div class="claim-evidence">"${esc(c.quote || c.evidence_text)}"</div>` : ''}
         <div class="claim-notes mt-1">
           <textarea placeholder="Add research notes…" data-claim="${c.id}" onchange="saveCN(this)">${esc(savedNote)}</textarea>
         </div>
