@@ -334,8 +334,8 @@ function fullName(p) {
 function lifeDatesStr(p, events) {
   const birthEvt = events.find(e => e.type === 'birth');
   const deathEvt = events.find(e => e.type === 'death');
-  const bs = birthEvt ? (birthEvt._date_original || (birthEvt.date_qualifier === 'about' ? 'c. ' : '') + (birthEvt.date_year || '?')) : '?';
-  const ds = deathEvt ? (deathEvt._date_original || (deathEvt.date_qualifier === 'about' ? 'c. ' : '') + (deathEvt.date_year || '?')) : '?';
+  const bs = birthEvt ? (birthEvt._date_original || (birthEvt.date_qualifier === 'about' ? 'c. ' : '') + (birthEvt.date_year || '?')) : (p.birth_year || '?');
+  const ds = deathEvt ? (deathEvt._date_original || (deathEvt.date_qualifier === 'about' ? 'c. ' : '') + (deathEvt.date_year || '?')) : (p.death_year || '?');
   return `(${bs} – ${ds})`;
 }
 
@@ -374,7 +374,9 @@ async function init(){
 
   // Brick walls from research_notes
   const brickWalls = person.research_notes ? person.research_notes.split('\n').filter(Boolean) : [];
-  const completeness = claims.length > 0 ? Math.min(100, Math.round(claims.length * 12)) : 0;
+  // Estimate completeness from available data
+  const fieldsFilled = [person.birth_year, person.death_year, person.birth_place, person.death_place, person.sex !== 'U' ? person.sex : null, person.family_line, person.narrative].filter(Boolean).length;
+  const completeness = claims.length > 0 ? Math.min(100, Math.round(claims.length * 12)) : Math.min(50, Math.round(fieldsFilled * 7));
 
   const relation = person.family_line ? `${person.family_line.toUpperCase()} Line` : '';
   document.title = `${name} — Lineage Research Hub`;
@@ -414,19 +416,40 @@ async function init(){
 
   // Key facts from claims
   function factsRows(){
-    return claims.map(c => {
+    let rows = claims.map(c => {
       const src = getSource(sources, c.source_id);
       const label = (c.claim_type || '').replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
       let value = c.claim_value || '';
-      // If claim references another individual, resolve name
       const related = getRelated(relatedPersons, value);
       if (related) value = fullName(related);
       return `<tr><td style="color:var(--gold);font-weight:500">${esc(label)}</td><td>${esc(value)}</td><td>${src ? esc(src.title) : '—'}</td><td>${badge(c.confidence)}</td></tr>`;
     }).join('');
+    
+    // If no claims, generate facts from individual record fields
+    if (!claims.length) {
+      const facts = [];
+      if (person.birth_year) facts.push(['Birth', `${person.birth_year}${person.birth_place ? ', ' + person.birth_place : ''}`]);
+      if (person.death_year) facts.push(['Death', `${person.death_year}${person.death_place ? ', ' + person.death_place : ''}`]);
+      if (person.sex && person.sex !== 'U') facts.push(['Sex', person.sex === 'M' ? 'Male' : person.sex === 'F' ? 'Female' : person.sex]);
+      if (person.maiden_name) facts.push(['Maiden Name', person.maiden_name]);
+      if (person.family_line) facts.push(['Family Line', person.family_line]);
+      if (person.generation) facts.push(['Generation', person.generation]);
+      rows = facts.map(([label, value]) => 
+        `<tr><td style="color:var(--gold);font-weight:500">${esc(label)}</td><td>${esc(String(value))}</td><td>Individual Record</td><td>${badge('probable')}</td></tr>`
+      ).join('');
+    }
+    return rows;
   }
 
   // Timeline
   function timelineHTML(){
+    if (!events.length && (person.birth_year || person.death_year)) {
+      // Generate timeline from individual record
+      let html = '';
+      if (person.birth_year) html += `<div class="tl-event"><div class="tl-dot probable"></div><div class="tl-date"><span class="tl-icon">👶</span>${person.birth_year}</div><div class="tl-desc">Birth</div>${person.birth_place ? `<div class="tl-location">📍 ${esc(person.birth_place)}</div>` : ''}</div>`;
+      if (person.death_year) html += `<div class="tl-event"><div class="tl-dot probable"></div><div class="tl-date"><span class="tl-icon">✝️</span>${person.death_year}</div><div class="tl-desc">Death</div>${person.death_place ? `<div class="tl-location">📍 ${esc(person.death_place)}</div>` : ''}</div>`;
+      return html;
+    }
     if (!events.length) return '<p style="color:var(--text-dim)">No events recorded yet.</p>';
     return events.map(e => {
       const icon = EVENT_ICONS[e.type] || '📌';
@@ -544,7 +567,7 @@ async function init(){
       <div class="person-dates">${esc(dates)}</div>
       <div class="person-relation">${esc(relation)}</div>
       <div class="progress-row"><div class="progress-bar"><div class="progress-fill" style="width:${completeness}%"></div></div><span class="progress-label">${completeness}% Researched</span></div>
-      <div class="quick-stats"><span>${claims.length} Claims</span><span>${sources.length} Sources</span><span>${brickWalls.length} Brick Walls</span></div>
+      <div class="quick-stats"><span>${claims.length || fieldsFilled} ${claims.length ? 'Claims' : 'Facts'}</span><span>${sources.length} Sources</span><span>${brickWalls.length} Brick Walls</span></div>
     </div>
     <div class="tabs-bar">
       <button class="tab-btn active" data-tab="summary">Summary</button>
