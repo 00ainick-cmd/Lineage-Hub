@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lineage Research Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+--bg:#0d0d14;--surface:#1a1a2e;--surface2:#222240;--surface-border:#2a2a3e;
+--gold:#c5960c;--gold-dim:#a07a0a;--parchment:#f5f0e8;--parchment-dim:#b8b0a4;
+--green:#2e7d32;--amber:#d4760a;--red:#c62828;
+}
+html{scroll-behavior:smooth}
+body{
+font-family:'Inter',sans-serif;background:var(--bg);color:var(--parchment);
+min-height:100vh;line-height:1.6;
+background-image:
+radial-gradient(ellipse at 20% 50%, rgba(197,150,12,0.03) 0%, transparent 50%),
+radial-gradient(ellipse at 80% 20%, rgba(197,150,12,0.02) 0%, transparent 40%),
+radial-gradient(ellipse at 50% 80%, rgba(26,26,46,0.8) 0%, transparent 60%);
+}
+h1,h2,h3,h4{font-family:'Playfair Display',serif;font-weight:600}
+a{color:var(--gold);text-decoration:none;transition:color .2s}
+a:hover{color:var(--parchment)}
+
+/* Nav */
+nav{
+position:sticky;top:0;z-index:100;
+background:rgba(13,13,20,0.92);backdrop-filter:blur(12px);
+border-bottom:1px solid var(--surface-border);
+}
+.nav-inner{
+max-width:1200px;margin:0 auto;padding:.75rem 1.5rem;
+display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;
+}
+.nav-brand{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--gold);font-weight:700}
+.nav-links{display:flex;gap:1.5rem;flex-wrap:wrap}
+.nav-links a{font-size:.85rem;color:var(--parchment-dim);letter-spacing:.02em;font-weight:400}
+.nav-links a:hover,.nav-links a.active{color:var(--gold)}
+
+/* Container */
+.container{max-width:1200px;margin:0 auto;padding:0 1.5rem}
+
+/* Ornamental divider */
+.divider{
+text-align:center;margin:2.5rem 0;position:relative;height:1px;
+background:linear-gradient(90deg,transparent,var(--surface-border),var(--gold-dim),var(--surface-border),transparent);
+}
+.divider::after{
+content:'✦';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+background:var(--bg);padding:0 1rem;color:var(--gold-dim);font-size:.7rem;
+}
+
+/* Hero */
+.hero{text-align:center;padding:3.5rem 0 1.5rem}
+.hero h1{font-size:clamp(2rem,5vw,3.2rem);color:var(--parchment);font-weight:700;margin-bottom:.5rem}
+.hero h1 span{color:var(--gold)}
+.hero .tagline{color:var(--parchment-dim);font-size:1.05rem;font-weight:300;margin-bottom:1.5rem}
+
+/* Search bar */
+.search-bar{max-width:560px;margin:0 auto 1.5rem;position:relative}
+.search-bar input{
+width:100%;background:var(--surface);border:1px solid var(--surface-border);border-radius:8px;
+padding:.7rem 1rem .7rem 2.5rem;color:var(--parchment);font-size:.9rem;font-family:'Inter',sans-serif;
+transition:border-color .2s;
+}
+.search-bar input:focus{outline:none;border-color:var(--gold)}
+.search-bar input::placeholder{color:var(--parchment-dim)}
+.search-icon{position:absolute;left:.85rem;top:50%;transform:translateY(-50%);color:var(--parchment-dim);font-size:.9rem;pointer-events:none}
+.search-results{
+position:absolute;top:100%;left:0;right:0;background:var(--surface);border:1px solid var(--gold-dim);
+border-radius:0 0 8px 8px;max-height:300px;overflow-y:auto;z-index:50;display:none;
+}
+.search-results.visible{display:block}
+.search-result-item{
+padding:.6rem 1rem;border-bottom:1px solid var(--surface-border);cursor:pointer;transition:background .15s;
+display:flex;justify-content:space-between;align-items:center;
+}
+.search-result-item:hover{background:var(--surface2)}
+.search-result-item:last-child{border-bottom:none}
+.sr-name{font-size:.88rem;color:var(--parchment)}
+.sr-meta{font-size:.72rem;color:var(--parchment-dim)}
+.sr-family{font-size:.68rem;padding:.1rem .35rem;border-radius:3px;background:rgba(197,150,12,.1);color:var(--gold)}
+
+/* Family pills */
+.family-pills{display:flex;justify-content:center;gap:.5rem;flex-wrap:wrap}
+.family-pill{
+padding:.45rem 1.1rem;border:1px solid var(--surface-border);border-radius:20px;
+font-size:.82rem;letter-spacing:.04em;font-weight:500;
+cursor:pointer;transition:all .25s;background:var(--surface);color:var(--parchment-dim);
+font-family:'Inter',sans-serif;
+}
+.family-pill.active{border-color:var(--gold);color:var(--gold);background:rgba(197,150,12,0.08)}
+.family-pill:hover{border-color:var(--gold-dim);color:var(--parchment)}
+.family-pill .count{font-size:.7rem;opacity:.7;margin-left:.3rem}
+
+/* Section headings */
+.section-title{
+font-size:1.4rem;color:var(--parchment);margin-bottom:1.5rem;
+display:flex;align-items:center;gap:.6rem;
+}
+.section-title .icon{color:var(--gold);font-size:1.1rem}
+
+/* Cards grid */
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1.25rem}
+
+/* Family cards */
+.family-card{
+background:var(--surface);border:1px solid var(--surface-border);border-radius:8px;
+padding:1.75rem;position:relative;overflow:hidden;transition:border-color .3s,transform .2s;
+}
+.family-card:hover{border-color:var(--gold-dim);transform:translateY(-2px)}
+.family-card::before{
+content:'';position:absolute;top:0;left:0;right:0;height:3px;
+background:linear-gradient(90deg,var(--gold),var(--gold-dim),transparent);opacity:.6;
+}
+.family-card.coming-soon{opacity:.45;pointer-events:none}
+.family-card.coming-soon::before{background:var(--surface-border)}
+.family-card h3{font-size:1.6rem;letter-spacing:.06em;margin-bottom:.25rem}
+.family-card .subtitle{font-size:.8rem;color:var(--parchment-dim);margin-bottom:1.25rem}
+.family-card .stats{display:flex;flex-direction:column;gap:.6rem;margin-bottom:1.25rem}
+.stat-row{display:flex;justify-content:space-between;font-size:.85rem}
+.stat-row .label{color:var(--parchment-dim)}
+.stat-row .value{color:var(--parchment);font-weight:500}
+.progress-bar{
+height:6px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden;margin-top:.3rem;
+}
+.progress-fill{height:100%;border-radius:3px;transition:width .8s ease}
+.brick-walls{color:var(--amber);font-size:.85rem;margin-bottom:1rem}
+.btn{
+display:inline-block;padding:.5rem 1.2rem;font-size:.85rem;font-weight:500;
+border:1px solid var(--gold);color:var(--gold);border-radius:4px;
+transition:all .25s;cursor:pointer;background:transparent;
+}
+.btn:hover{background:var(--gold);color:var(--bg)}
+.coming-badge{
+display:inline-block;padding:.3rem .8rem;font-size:.75rem;color:var(--parchment-dim);
+border:1px solid var(--surface-border);border-radius:3px;margin-top:.5rem;
+}
+
+/* Individual list (shown when a family is selected) */
+.individuals-list{margin-top:1.25rem}
+.individual-row{
+display:flex;justify-content:space-between;align-items:center;
+padding:.5rem .75rem;border-bottom:1px solid var(--surface-border);font-size:.85rem;
+transition:background .15s;cursor:pointer;border-radius:4px;
+}
+.individual-row:hover{background:var(--surface2)}
+.individual-row:last-child{border-bottom:none}
+.ind-name{color:var(--parchment);font-weight:500}
+.ind-meta{color:var(--parchment-dim);font-size:.75rem;display:flex;gap:.5rem;align-items:center}
+.ind-status{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.ind-status.active{background:var(--green)}
+.ind-status.brick-wall{background:var(--amber)}
+.ind-status.new{background:var(--gold)}
+
+/* Quick stats */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1rem}
+.stat-card{
+background:var(--surface);border:1px solid var(--surface-border);border-radius:8px;
+padding:1.25rem;text-align:center;transition:border-color .2s;
+}
+.stat-card .number{font-family:'Playfair Display',serif;font-size:2rem;color:var(--gold);font-weight:700}
+.stat-card .desc{font-size:.8rem;color:var(--parchment-dim);margin-top:.25rem}
+
+/* Tools */
+.tool-card{
+background:var(--surface);border:1px solid var(--surface-border);border-radius:8px;
+padding:1.5rem;transition:border-color .3s,transform .2s;display:block;
+}
+.tool-card:hover{border-color:var(--gold-dim);transform:translateY(-2px);color:var(--parchment)}
+.tool-card .tool-icon{font-size:1.5rem;margin-bottom:.75rem}
+.tool-card h4{font-size:1.05rem;color:var(--parchment);margin-bottom:.4rem}
+.tool-card p{font-size:.85rem;color:var(--parchment-dim);line-height:1.5}
+
+/* Activity */
+.activity-list{display:flex;flex-direction:column;gap:.75rem}
+.activity-item{
+display:flex;align-items:flex-start;gap:1rem;padding:1rem 1.25rem;
+background:var(--surface);border:1px solid var(--surface-border);border-radius:6px;
+font-size:.9rem;
+}
+.activity-dot{
+width:8px;height:8px;border-radius:50%;background:var(--gold);margin-top:.4rem;flex-shrink:0;
+}
+.activity-item .time{color:var(--parchment-dim);font-size:.75rem;margin-top:.2rem}
+
+/* Confidence legend */
+.confidence{display:flex;gap:1.25rem;flex-wrap:wrap;font-size:.8rem;color:var(--parchment-dim);margin-top:1rem}
+
+/* Footer */
+footer{
+text-align:center;padding:2.5rem 1.5rem;margin-top:3rem;
+border-top:1px solid var(--surface-border);color:var(--parchment-dim);font-size:.8rem;
+}
+footer a{color:var(--gold-dim)}
+footer .links{display:flex;justify-content:center;gap:1.5rem;margin-top:.75rem;flex-wrap:wrap}
+
+/* Responsive */
+@media(max-width:600px){
+.hero{padding:2.5rem 0 1.5rem}
+.hero h1{font-size:1.8rem}
+.card-grid{grid-template-columns:1fr}
+.stats-grid{grid-template-columns:repeat(2,1fr)}
+.nav-links{gap:1rem}
+}
+
+section{margin-bottom:1rem}
+</style>
+</head>
+<body>
+
+<nav>
+<div class="nav-inner">
+<div class="nav-brand">⚜ Lineage</div>
+<div class="nav-links">
+<a href="index.html" class="active">Home</a>
+<a href="converter.html">GEDCOM Converter</a>
+<a href="research.html">Research</a>
+<a href="documents.html">Documents</a>
+<a href="tree.html">Family Tree</a>
+</div>
+</div>
+</nav>
+
+<div class="container">
+
+<!-- Hero -->
+<section class="hero">
+<h1><span>Lineage</span> Research Hub</h1>
+<p class="tagline">Evidence-based genealogy research, powered by AI.</p>
+
+<!-- Search -->
+<div class="search-bar">
+<span class="search-icon">🔍</span>
+<input type="text" id="searchInput" placeholder="Search individuals by name, place, or year…" autocomplete="off">
+<div class="search-results" id="searchResults"></div>
+</div>
+
+<!-- Family Filter Pills -->
+<div class="family-pills" id="familyPills">
+<div class="family-pill active" data-family="all">ALL <span class="count" id="pill-count-all"></span></div>
+<div class="family-pill" data-family="brown">BROWN <span class="count" id="pill-count-brown"></span></div>
+<div class="family-pill" data-family="chaney">CHANEY <span class="count" id="pill-count-chaney"></span></div>
+<div class="family-pill" data-family="crawley">CRAWLEY <span class="count" id="pill-count-crawley"></span></div>
+<div class="family-pill" data-family="hess">HESS <span class="count" id="pill-count-hess"></span></div>
+</div>
+</section>
+
+<div class="divider"></div>
+
+<!-- Quick Stats -->
+<section>
+<div class="section-title"><span class="icon">📊</span> Research Overview</div>
+<div class="stats-grid" id="stats-dashboard">
+<div class="stat-card"><div class="number" id="stat-individuals">—</div><div class="desc">Individuals</div></div>
+<div class="stat-card"><div class="number" id="stat-sources">—</div><div class="desc">Sources</div></div>
+<div class="stat-card"><div class="number" id="stat-claims">—</div><div class="desc">Claims</div></div>
+<div class="stat-card"><div class="number" id="stat-brickwalls">—</div><div class="desc">Brick Walls</div></div>
+</div>
+</section>
+
+<div class="divider"></div>
+
+<!-- Family Overview -->
+<section>
+<div class="section-title"><span class="icon">📜</span> <span id="family-section-title">Family Lines</span></div>
+<div class="card-grid" id="family-cards"></div>
+<div class="confidence">
+<span>🟢 Proven</span><span>🟡 Probable</span><span>🟠 Possible</span><span>🔴 Questionable</span>
+</div>
+</section>
+
+<div class="divider"></div>
+
+<!-- Tools -->
+<section>
+<div class="section-title"><span class="icon">🛠</span> Research Tools</div>
+<div class="card-grid">
+<a href="converter.html" class="tool-card">
+<div class="tool-icon">🔄</div>
+<h4>GEDCOM Converter</h4>
+<p>Import your family tree from Ancestry, FamilySearch, or any GEDCOM source.</p>
+</a>
+<a href="research.html" class="tool-card">
+<div class="tool-icon">📓</div>
+<h4>Research Journal</h4>
+<p>GTD-style research management — inbox, active tasks, brick walls, search log.</p>
+</a>
+<a href="documents.html" class="tool-card">
+<div class="tool-icon">📄</div>
+<h4>Document Processor</h4>
+<p>Upload and process census records, vital records, newspapers, and more.</p>
+</a>
+<a href="tree.html" class="tool-card">
+<div class="tool-icon">🌳</div>
+<h4>Family Tree</h4>
+<p>Interactive pedigree chart visualization.</p>
+</a>
+</div>
+</section>
+
+<div class="divider"></div>
+
+<!-- Recent Activity -->
+<section>
+<div class="section-title"><span class="icon">🕰</span> Recent Activity</div>
+<div class="activity-list" id="activity-list">
+<div class="activity-item">
+<div class="activity-dot"></div>
+<div>
+<div>Loading activity…</div>
+<div class="time"></div>
+</div>
+</div>
+</div>
+</section>
+
+</div>
+
+<footer>
+<div>Built with <strong style="color:var(--gold)">Lineage</strong> · Evidence-based genealogy research</div>
+<div class="links">
+<a href="index.html">Home</a>
+<a href="converter.html">GEDCOM Converter</a>
+<a href="research.html">Research</a>
+<a href="documents.html">Documents</a>
+<a href="tree.html">Family Tree</a>
+</div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script>
+(function(){
+
+/* ── State ── */
+const KNOWN_LINES = ['brown','chaney','crawley','hess'];
+let families = {};
+KNOWN_LINES.forEach(l => {
+  families[l] = { name:l.toUpperCase(), individuals:0, sources:0, completeness:0, brickWalls:0, active:false, people:[] };
+});
+
+let allIndividuals = []; // flat list for search
+let dashboardCounts = { individuals:0, sources:0, claims:0, brickWalls:0 };
+let selectedFamily = 'all';
+const statusEl = createConnectionIndicator();
+
+/* ── Rendering ── */
+function renderFamilyCards() {
+  const el = document.getElementById('family-cards');
+  const linesToShow = selectedFamily === 'all' ? KNOWN_LINES : [selectedFamily];
+  // Also show any extra lines found in DB
+  const allLines = [...new Set([...KNOWN_LINES, ...Object.keys(families)])];
+  const visibleLines = selectedFamily === 'all' ? allLines : [selectedFamily];
+  
+  document.getElementById('family-section-title').textContent = 
+    selectedFamily === 'all' ? 'Family Lines' : families[selectedFamily]?.name + ' Line';
+  
+  el.innerHTML = visibleLines.map(line => {
+    const f = families[line];
+    if (!f) return '';
+    if (!f.active) return `
+      <div class="family-card coming-soon">
+        <h3>${f.name}</h3>
+        <p class="subtitle">Family Line</p>
+        <div class="coming-badge">Coming Soon</div>
+      </div>`;
+    const green = f.completeness >= 50 ? 'var(--green)' : f.completeness >= 20 ? 'var(--gold)' : 'var(--amber)';
+    
+    // Show individual list when a specific family is selected
+    let individualsHTML = '';
+    if (selectedFamily !== 'all' && f.people.length) {
+      individualsHTML = `<div class="individuals-list">${f.people.slice(0, 20).map(p => {
+        const statusCls = (p.research_notes && p.research_notes.toLowerCase().includes('brick wall')) ? 'brick-wall' : 'active';
+        const name = [p.given_name, p.middle_name, p.surname].filter(Boolean).join(' ') || 'Unknown';
+        return `<div class="individual-row" onclick="window.location.href='person.html?id=${p.id}'">
+          <span class="ind-name">${esc(name)}</span>
+          <div class="ind-meta"><div class="ind-status ${statusCls}"></div><span>${esc(p.research_status || '')}</span></div>
+        </div>`;
+      }).join('')}${f.people.length > 20 ? `<div style="text-align:center;padding:.5rem;font-size:.78rem;color:var(--parchment-dim)">+ ${f.people.length - 20} more</div>` : ''}</div>`;
+    }
+    
+    return `
+      <div class="family-card">
+        <h3>${f.name}</h3>
+        <p class="subtitle">Family Line</p>
+        <div class="stats">
+          <div class="stat-row"><span class="label">Individuals</span><span class="value">${f.individuals}</span></div>
+          <div class="stat-row"><span class="label">Sources</span><span class="value">${f.sources}</span></div>
+          <div class="stat-row"><span class="label">Completeness</span><span class="value">${f.completeness}%</span></div>
+          <div class="progress-bar"><div class="progress-fill" style="width:${f.completeness}%;background:${green}"></div></div>
+        </div>
+        ${f.brickWalls ? `<div class="brick-walls">🧱 ${f.brickWalls} brick wall${f.brickWalls>1?'s':''} to solve</div>` : ''}
+        <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+          <a href="research.html?family=${f.name.toLowerCase()}" class="btn">Research →</a>
+          <a href="research.html?family=${f.name.toLowerCase()}&tab=brick_wall" class="btn" style="border-color:var(--amber);color:var(--amber)">Brick Walls</a>
+        </div>
+        ${individualsHTML}
+      </div>`;
+  }).join('');
+}
+
+function renderStats() {
+  if (selectedFamily === 'all') {
+    document.getElementById('stat-individuals').textContent = dashboardCounts.individuals;
+    document.getElementById('stat-sources').textContent = dashboardCounts.sources;
+    document.getElementById('stat-claims').textContent = dashboardCounts.claims;
+    document.getElementById('stat-brickwalls').textContent = dashboardCounts.brickWalls || 0;
+  } else {
+    const f = families[selectedFamily];
+    if (f) {
+      document.getElementById('stat-individuals').textContent = f.individuals;
+      document.getElementById('stat-sources').textContent = f.sources;
+      document.getElementById('stat-claims').textContent = Math.round(f.individuals * 2.5);
+      document.getElementById('stat-brickwalls').textContent = f.brickWalls;
+    }
+  }
+}
+
+function renderPillCounts() {
+  const totalEl = document.getElementById('pill-count-all');
+  if (totalEl) totalEl.textContent = dashboardCounts.individuals ? `(${dashboardCounts.individuals})` : '';
+  KNOWN_LINES.forEach(l => {
+    const el = document.getElementById('pill-count-' + l);
+    if (el) el.textContent = families[l].individuals ? `(${families[l].individuals})` : '';
+  });
+}
+
+function esc(s) { if (!s) return ''; const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+/* ── Search ── */
+function setupSearch() {
+  const input = document.getElementById('searchInput');
+  const results = document.getElementById('searchResults');
+  let debounce;
+  
+  input.addEventListener('input', () => {
+    clearTimeout(debounce);
+    debounce = setTimeout(() => {
+      const q = input.value.trim().toLowerCase();
+      if (q.length < 2) { results.classList.remove('visible'); return; }
+      
+      const matches = allIndividuals.filter(p => {
+        const name = [p.given_name, p.middle_name, p.surname].filter(Boolean).join(' ').toLowerCase();
+        const line = (p.family_line || '').toLowerCase();
+        return name.includes(q) || line.includes(q) || (p.birth_year && String(p.birth_year).includes(q));
+      }).slice(0, 10);
+      
+      if (!matches.length) {
+        results.innerHTML = '<div style="padding:.75rem 1rem;color:var(--parchment-dim);font-size:.85rem">No results found</div>';
+      } else {
+        results.innerHTML = matches.map(p => {
+          const name = [p.given_name, p.middle_name, p.surname].filter(Boolean).join(' ');
+          const line = (p.family_line || '').toUpperCase();
+          return `<div class="search-result-item" onclick="window.location.href='person.html?id=${p.id}'">
+            <div><div class="sr-name">${esc(name)}</div><div class="sr-meta">${p.birth_year ? 'b. ' + p.birth_year : ''}</div></div>
+            ${line ? `<span class="sr-family">${line}</span>` : ''}
+          </div>`;
+        }).join('');
+      }
+      results.classList.add('visible');
+    }, 200);
+  });
+  
+  // Close on click outside
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.search-bar')) results.classList.remove('visible');
+  });
+  
+  input.addEventListener('focus', () => {
+    if (input.value.trim().length >= 2) results.classList.add('visible');
+  });
+}
+
+/* ── Data Loading ── */
+async function loadFromSupabase(db) {
+  const { data: indivs, error: ie } = await db.from('individuals').select('*');
+  if (ie) throw ie;
+  
+  allIndividuals = indivs;
+  const byLine = {};
+  let brickWallTotal = 0;
+  
+  indivs.forEach(i => {
+    const line = (i.family_line || 'unknown').toLowerCase();
+    if (!byLine[line]) byLine[line] = { count: 0, brickWalls: 0, people: [] };
+    byLine[line].count++;
+    byLine[line].people.push(i);
+    if (i.research_notes && i.research_notes.toLowerCase().includes('brick wall')) byLine[line].brickWalls++;
+  });
+  
+  for (const [line, info] of Object.entries(byLine)) {
+    if (!families[line]) {
+      families[line] = { name: line.toUpperCase(), individuals: 0, sources: 0, completeness: 0, brickWalls: 0, active: false, people: [] };
+    }
+    families[line].individuals = info.count;
+    families[line].brickWalls = info.brickWalls;
+    families[line].active = info.count > 0;
+    families[line].people = info.people;
+    brickWallTotal += info.brickWalls;
+  }
+  
+  const { count: srcCount } = await db.from('sources').select('id', { count: 'exact', head: true });
+  const { count: claimCount } = await db.from('claims').select('id', { count: 'exact', head: true });
+  
+  const activeLines = Object.values(families).filter(f => f.active);
+  if (activeLines.length) activeLines.forEach(f => f.sources = srcCount || 0);
+  for (const f of activeLines) {
+    const avgClaims = f.individuals > 0 ? (claimCount || 0) / indivs.length : 0;
+    f.completeness = Math.min(100, Math.round(avgClaims * 10));
+  }
+  
+  dashboardCounts = { individuals: indivs.length, sources: srcCount || 0, claims: claimCount || 0, brickWalls: brickWallTotal };
+}
+
+async function loadFromJSON() {
+  const res = await fetch(LINEAGE_CONFIG.fallbackDataPath);
+  if (!res.ok) throw new Error('fetch failed');
+  const data = await res.json();
+  const indCount = Array.isArray(data.individuals) ? data.individuals.length : 0;
+  const srcCount = Array.isArray(data.sources) ? data.sources.length : 0;
+  const bwCount = Array.isArray(data.brick_walls||data.brickWalls) ? (data.brick_walls||data.brickWalls).length : 0;
+  
+  if (Array.isArray(data.individuals)) {
+    allIndividuals = data.individuals.map(i => ({
+      id: i.individual_id,
+      given_name: i.name?.given,
+      middle_name: i.name?.middle,
+      surname: i.name?.surname,
+      family_line: 'brown',
+      research_status: i.research_status,
+      research_notes: (i.brick_walls || []).join('\n')
+    }));
+    families.brown.people = allIndividuals;
+  }
+  
+  families.brown.individuals = indCount;
+  families.brown.sources = srcCount;
+  families.brown.completeness = data.completeness || 35;
+  families.brown.brickWalls = bwCount;
+  families.brown.active = true;
+  dashboardCounts = { individuals: indCount, sources: srcCount, claims: Math.round(indCount * 2.5), brickWalls: bwCount };
+}
+
+async function loadActivity(db) {
+  // Try to load recent research_log entries for activity feed
+  const actEl = document.getElementById('activity-list');
+  try {
+    if (db) {
+      const { data } = await db.from('research_log').select('*').order('created_at', { ascending: false }).limit(5);
+      if (data && data.length) {
+        actEl.innerHTML = data.map(e => {
+          const typeIcon = { inbox: '📥', task: '🔬', brick_wall: '🧱', search: '🔍', waiting: '⏳' }[e.activity_type] || '📋';
+          const d = new Date(e.created_at);
+          const timeStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+          return `<div class="activity-item"><div class="activity-dot"></div><div><div>${typeIcon} ${esc(e.description)}</div><div class="time">${timeStr}${e.family_line ? ' · ' + e.family_line.toUpperCase() : ''}</div></div></div>`;
+        }).join('');
+        return;
+      }
+    }
+  } catch(e) {}
+  
+  actEl.innerHTML = `
+    <div class="activity-item"><div class="activity-dot"></div><div><div>Research hub initialized</div><div class="time">Today</div></div></div>
+    <div class="activity-item"><div class="activity-dot"></div><div><div>Start by <a href="research.html">capturing research</a> in the journal</div><div class="time"></div></div></div>`;
+}
+
+async function loadData() {
+  const db = initSupabase();
+  try {
+    if (!db) throw new Error('No Supabase client');
+    await loadFromSupabase(db);
+    setConnectionStatus(statusEl, 'connected');
+    loadActivity(db);
+  } catch(e) {
+    console.warn('Supabase unavailable:', e.message);
+    try {
+      await loadFromJSON();
+      setConnectionStatus(statusEl, 'fallback');
+    } catch(e2) {
+      families.brown.active = true;
+      families.brown.individuals = 12;
+      families.brown.sources = 8;
+      families.brown.completeness = 35;
+      families.brown.brickWalls = 3;
+      dashboardCounts = { individuals: 12, sources: 8, claims: 30, brickWalls: 3 };
+      setConnectionStatus(statusEl, 'error');
+    }
+    loadActivity(null);
+  }
+  renderPillCounts();
+  renderFamilyCards();
+  renderStats();
+}
+
+/* ── Events ── */
+// Family pills
+document.querySelectorAll('.family-pill').forEach(pill => {
+  pill.addEventListener('click', () => {
+    document.querySelectorAll('.family-pill').forEach(p => p.classList.remove('active'));
+    pill.classList.add('active');
+    selectedFamily = pill.dataset.family;
+    renderFamilyCards();
+    renderStats();
+  });
+});
+
+setupSearch();
+loadData();
+
+})();
+</script>
+</body>
+</html>

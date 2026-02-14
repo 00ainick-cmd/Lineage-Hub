@@ -1,0 +1,205 @@
+{
+  "family_line": "BROWN",
+  "description": "Brown family of Harrison County and Stark County, Ohio",
+  "individuals": [
+    {
+      "individual_id": "ind_raymond_mb",
+      "name": {"given": "Raymond", "middle": "M", "surname": "Brown", "suffix": "", "maiden": "", "aliases": []},
+      "sex": "M",
+      "living": false,
+      "relationships": [
+        {"type": "child", "individual_id": "ind_joshua_db", "relation": "father"},
+        {"type": "child", "individual_id": "ind_pearl_sab", "relation": "mother"}
+      ],
+      "research_status": "active",
+      "research_completeness": 35,
+      "brick_walls": [
+        "No death certificate located",
+        "Military service details (unit, dates) unconfirmed",
+        "Canton/Massillon residence timeline incomplete"
+      ]
+    },
+    {
+      "individual_id": "ind_joshua_db",
+      "name": {"given": "Joshua", "middle": "Delmer", "surname": "Brown", "suffix": "", "maiden": "", "aliases": []},
+      "sex": "M",
+      "living": false,
+      "relationships": [
+        {"type": "spouse", "individual_id": "ind_pearl_sab"},
+        {"type": "parent", "individual_id": "ind_raymond_mb"}
+      ],
+      "research_status": "not_started",
+      "research_completeness": 10,
+      "brick_walls": [
+        "Birth date approximate only (~1878)",
+        "Parents unknown",
+        "Marriage record not located"
+      ]
+    },
+    {
+      "individual_id": "ind_pearl_sab",
+      "name": {"given": "Pearl", "middle": "Sue Ann", "surname": "Brown", "suffix": "", "maiden": "Unknown", "aliases": []},
+      "sex": "F",
+      "living": false,
+      "relationships": [
+        {"type": "spouse", "individual_id": "ind_joshua_db"},
+        {"type": "parent", "individual_id": "ind_raymond_mb"}
+      ],
+      "research_status": "not_started",
+      "research_completeness": 8,
+      "brick_walls": [
+        "Maiden name UNKNOWN — critical research target",
+        "Birth date approximate only (~1882)",
+        "Parents completely unknown"
+      ]
+    }
+  ],
+  "events": [
+    {
+      "event_id": "evt_raymond_birth",
+      "type": "birth",
+      "date": {"original": "Dec 9, 1906", "normalized": "1906-12-09", "precision": "exact", "qualifier": null},
+      "place": {"original": "Monroe Township, Harrison County, Ohio", "country": "USA", "state": "Ohio", "county": "Harrison", "city": "Monroe Township", "address": ""},
+      "participants": [
+        {"individual_id": "ind_raymond_mb", "role": "principal"},
+        {"individual_id": "ind_joshua_db", "role": "parent"},
+        {"individual_id": "ind_pearl_sab", "role": "parent"}
+      ],
+      "source_ids": ["src_1910_census"]
+    },
+    {
+      "event_id": "evt_raymond_death",
+      "type": "death",
+      "date": {"original": "~1962", "normalized": "1962", "precision": "year", "qualifier": "about"},
+      "place": {"original": "Canton, Stark County, Ohio", "country": "USA", "state": "Ohio", "county": "Stark", "city": "Canton", "address": ""},
+      "participants": [{"individual_id": "ind_raymond_mb", "role": "principal"}],
+      "source_ids": ["src_familysearch"]
+    },
+    {
+      "event_id": "evt_raymond_military",
+      "type": "military_service",
+      "date": {"original": "WWII era", "normalized": "1942", "precision": "decade", "qualifier": "about"},
+      "place": {"original": "", "country": "USA", "state": "", "county": "", "city": "", "address": ""},
+      "participants": [{"individual_id": "ind_raymond_mb", "role": "principal"}],
+      "source_ids": ["src_familysearch"]
+    },
+    {
+      "event_id": "evt_raymond_residence",
+      "type": "residence",
+      "date": {"original": "~1950s-1962", "normalized": "1955", "precision": "decade", "qualifier": "about"},
+      "place": {"original": "Canton/Massillon area, Stark County, Ohio", "country": "USA", "state": "Ohio", "county": "Stark", "city": "Canton", "address": ""},
+      "participants": [{"individual_id": "ind_raymond_mb", "role": "principal"}],
+      "source_ids": ["src_familysearch"]
+    },
+    {
+      "event_id": "evt_raymond_occupation",
+      "type": "occupation",
+      "date": {"original": "", "normalized": "", "precision": "estimated", "qualifier": null},
+      "place": {"original": "Stark County, Ohio", "country": "USA", "state": "Ohio", "county": "Stark", "city": "", "address": ""},
+      "participants": [{"individual_id": "ind_raymond_mb", "role": "principal"}],
+      "source_ids": ["src_familysearch"],
+      "details": {"occupation": "Painter"}
+    }
+  ],
+  "sources": [
+    {
+      "source_id": "src_1910_census",
+      "type": "census",
+      "subtype": "1910 Federal Census",
+      "title": "1910 United States Federal Census — Harrison County, Ohio",
+      "citation": "1910 U.S. Census, Harrison County, Ohio, Monroe Township, ED [unknown], sheet [unknown], line [unknown]; NARA microfilm T624.",
+      "repository": "National Archives and Records Administration",
+      "repository_ref": "NARA T624",
+      "processing_status": "needs_verification",
+      "confidence": "probable"
+    },
+    {
+      "source_id": "src_familysearch",
+      "type": "other",
+      "subtype": "FamilySearch Profile",
+      "title": "FamilySearch Family Tree — Raymond M Brown",
+      "citation": "FamilySearch Family Tree, accessed 2026.",
+      "repository": "FamilySearch",
+      "repository_ref": "",
+      "processing_status": "imported",
+      "confidence": "possible"
+    }
+  ],
+  "claims": [
+    {
+      "claim_id": "clm_raymond_birth_date",
+      "individual_id": "ind_raymond_mb",
+      "attribute": "birth_date",
+      "value": "1906-12-09",
+      "source_id": "src_1910_census",
+      "evidence": "Census enumeration shows Raymond Brown age 3 in household of Joshua and Pearl Brown, Monroe Township",
+      "confidence": "probable",
+      "gps_score": null,
+      "notes": "Birth date derived from age in 1910 census. Need birth certificate for exact confirmation."
+    },
+    {
+      "claim_id": "clm_raymond_death",
+      "individual_id": "ind_raymond_mb",
+      "attribute": "death_date",
+      "value": "~1962",
+      "source_id": "src_familysearch",
+      "evidence": "FamilySearch tree entry. No primary source identified.",
+      "confidence": "possible",
+      "gps_score": null,
+      "notes": "Death date unverified. Need death certificate or obituary."
+    },
+    {
+      "claim_id": "clm_raymond_father",
+      "individual_id": "ind_raymond_mb",
+      "attribute": "father",
+      "value": "ind_joshua_db",
+      "source_id": "src_1910_census",
+      "evidence": "1910 census shows Raymond in household of Joshua Brown (head) and Pearl Brown (wife)",
+      "confidence": "probable",
+      "gps_score": null
+    },
+    {
+      "claim_id": "clm_raymond_mother",
+      "individual_id": "ind_raymond_mb",
+      "attribute": "mother",
+      "value": "ind_pearl_sab",
+      "source_id": "src_1910_census",
+      "evidence": "1910 census shows Pearl Brown as wife of Joshua Brown in household with Raymond",
+      "confidence": "probable",
+      "gps_score": null
+    },
+    {
+      "claim_id": "clm_pearl_maiden_unknown",
+      "individual_id": "ind_pearl_sab",
+      "attribute": "maiden_name",
+      "value": "UNKNOWN",
+      "source_id": null,
+      "evidence": "No source located for maiden name",
+      "confidence": "unknown",
+      "gps_score": null,
+      "notes": "BRICK WALL — Priority research target. Check Harrison County marriage records 1900-1906."
+    },
+    {
+      "claim_id": "clm_raymond_occupation",
+      "individual_id": "ind_raymond_mb",
+      "attribute": "occupation",
+      "value": "Painter",
+      "source_id": "src_familysearch",
+      "evidence": "FamilySearch tree entry",
+      "confidence": "possible",
+      "gps_score": null,
+      "notes": "Need census or city directory confirmation"
+    },
+    {
+      "claim_id": "clm_raymond_military",
+      "individual_id": "ind_raymond_mb",
+      "attribute": "military_service",
+      "value": "WWII veteran, American Legion member (Massillon)",
+      "source_id": "src_familysearch",
+      "evidence": "FamilySearch tree entry. American Legion membership noted.",
+      "confidence": "possible",
+      "gps_score": null,
+      "notes": "Request NPRC military service record (SF-180). Check American Legion Post records in Massillon."
+    }
+  ]
+}

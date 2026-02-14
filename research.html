@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Research Journal — Lineage Research Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+--bg:#0d0d14;--surface:#1a1a2e;--surface2:#222240;--surface-border:#2a2a3e;
+--gold:#c5960c;--gold-dim:#a07a0a;--parchment:#f5f0e8;--parchment-dim:#b8b0a4;
+--green:#2e7d32;--amber:#d4760a;--red:#c62828;--border:#333355;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--parchment);min-height:100vh;line-height:1.6;
+background-image:radial-gradient(ellipse at 20% 50%,rgba(197,150,12,.03) 0%,transparent 50%),radial-gradient(ellipse at 80% 20%,rgba(197,150,12,.02) 0%,transparent 40%)}
+h1,h2,h3,h4{font-family:'Playfair Display',serif;font-weight:600}
+a{color:var(--gold);text-decoration:none;transition:color .2s}a:hover{color:var(--parchment)}
+
+/* Nav */
+nav{position:sticky;top:0;z-index:100;background:rgba(13,13,20,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--surface-border)}
+.nav-inner{max-width:1200px;margin:0 auto;padding:.75rem 1.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem}
+.nav-brand{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--gold);font-weight:700}
+.nav-links{display:flex;gap:1.5rem;flex-wrap:wrap}
+.nav-links a{font-size:.85rem;color:var(--parchment-dim);letter-spacing:.02em;font-weight:400}
+.nav-links a:hover,.nav-links a.active{color:var(--gold)}
+
+.container{max-width:1200px;margin:0 auto;padding:0 1.5rem}
+
+/* Header */
+.page-header{padding:2.5rem 0 1.5rem;text-align:center}
+.page-header h1{font-size:clamp(1.8rem,4vw,2.6rem);color:var(--parchment);font-weight:700;margin-bottom:.3rem}
+.page-header h1 span{color:var(--gold)}
+.page-header .tagline{color:var(--parchment-dim);font-size:.95rem;font-weight:300}
+
+/* Quick Add */
+.quick-add{background:var(--surface);border:1px solid var(--surface-border);border-radius:10px;padding:1rem 1.25rem;margin:1rem 0 1.5rem;display:flex;gap:.75rem;align-items:center;flex-wrap:wrap}
+.quick-add input[type="text"]{flex:1;min-width:200px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:.6rem .9rem;color:var(--parchment);font-size:.9rem;font-family:'Inter',sans-serif}
+.quick-add input:focus{outline:none;border-color:var(--gold)}
+.quick-add select{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:.6rem .7rem;color:var(--parchment-dim);font-size:.8rem;font-family:'Inter',sans-serif;cursor:pointer}
+.quick-add select:focus{outline:none;border-color:var(--gold)}
+.quick-add button{background:var(--gold);color:var(--bg);border:none;border-radius:6px;padding:.6rem 1.2rem;font-size:.85rem;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:background .2s;white-space:nowrap}
+.quick-add button:hover{background:var(--parchment)}
+
+/* Filters row */
+.filters{display:flex;gap:.75rem;margin-bottom:1.25rem;flex-wrap:wrap;align-items:center}
+.filter-pills{display:flex;gap:.4rem;flex-wrap:wrap}
+.pill{padding:.35rem .85rem;border:1px solid var(--surface-border);border-radius:20px;font-size:.78rem;cursor:pointer;transition:all .2s;background:var(--surface);color:var(--parchment-dim);font-family:'Inter',sans-serif}
+.pill.active{border-color:var(--gold);color:var(--gold);background:rgba(197,150,12,.08)}
+.pill:hover{border-color:var(--gold-dim);color:var(--parchment)}
+.filter-select{background:var(--surface);border:1px solid var(--surface-border);border-radius:6px;padding:.35rem .6rem;color:var(--parchment-dim);font-size:.78rem;font-family:'Inter',sans-serif;cursor:pointer}
+
+/* Tabs */
+.tabs{display:flex;gap:0;border-bottom:2px solid var(--surface-border);margin-bottom:1.5rem;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tab-btn{background:none;border:none;color:var(--parchment-dim);font-family:'Inter',sans-serif;font-size:.85rem;font-weight:500;padding:.7rem 1.1rem;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;transition:color .2s,border-color .2s;display:flex;align-items:center;gap:.4rem}
+.tab-btn:hover{color:var(--parchment)}
+.tab-btn.active{color:var(--gold);border-bottom-color:var(--gold)}
+.tab-count{background:var(--surface2);padding:.1rem .45rem;border-radius:10px;font-size:.7rem;font-weight:600}
+.tab-btn.active .tab-count{background:rgba(197,150,12,.15);color:var(--gold)}
+
+/* Cards */
+.entry-card{background:var(--surface);border:1px solid var(--surface-border);border-radius:8px;padding:1rem 1.25rem;margin-bottom:.75rem;transition:border-color .2s;position:relative}
+.entry-card:hover{border-color:var(--gold-dim)}
+.entry-card.expanded{border-color:var(--gold)}
+.entry-header{display:flex;justify-content:space-between;align-items:flex-start;gap:.75rem;cursor:pointer}
+.entry-title{font-size:.92rem;color:var(--parchment);font-weight:500;flex:1}
+.entry-meta{display:flex;gap:.5rem;align-items:center;flex-shrink:0;flex-wrap:wrap}
+.entry-date{font-size:.7rem;color:var(--parchment-dim)}
+.entry-family{font-size:.7rem;padding:.15rem .45rem;border-radius:3px;background:rgba(197,150,12,.1);color:var(--gold);font-weight:500}
+.entry-body{display:none;margin-top:.75rem;padding-top:.75rem;border-top:1px solid var(--surface-border)}
+.entry-card.expanded .entry-body{display:block}
+
+/* Priority badges */
+.priority{font-size:.65rem;padding:.15rem .4rem;border-radius:3px;font-weight:600;text-transform:uppercase}
+.priority-high{background:rgba(198,40,40,.2);color:#ef5350}
+.priority-medium{background:rgba(212,118,10,.2);color:#ffb74d}
+.priority-low{background:rgba(46,125,50,.2);color:#66bb6a}
+
+/* Status badges */
+.status{font-size:.65rem;padding:.15rem .4rem;border-radius:3px;font-weight:600}
+.status-not-started{background:rgba(150,150,150,.2);color:#999}
+.status-in-progress{background:rgba(197,150,12,.2);color:var(--gold)}
+.status-found-something{background:rgba(46,125,50,.2);color:#66bb6a}
+.status-dead-end{background:rgba(198,40,40,.2);color:#ef5350}
+.status-pending{background:rgba(212,118,10,.2);color:#ffb74d}
+.status-received{background:rgba(46,125,50,.2);color:#66bb6a}
+.status-overdue{background:rgba(198,40,40,.2);color:#ef5350}
+
+/* Brick rating */
+.bricks{color:var(--amber);font-size:.8rem;letter-spacing:.1rem}
+
+/* Search result badge */
+.result-badge{font-size:.7rem;padding:.15rem .4rem;border-radius:3px;font-weight:500}
+.result-found{background:rgba(46,125,50,.2);color:#66bb6a}
+.result-nothing{background:rgba(150,150,150,.2);color:#999}
+.result-partial{background:rgba(212,118,10,.2);color:#ffb74d}
+
+/* Action buttons on cards */
+.entry-actions{display:flex;gap:.4rem;margin-top:.75rem;flex-wrap:wrap}
+.action-btn{background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:.3rem .65rem;font-size:.72rem;color:var(--parchment-dim);cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s}
+.action-btn:hover{border-color:var(--gold);color:var(--gold)}
+.action-btn.danger:hover{border-color:var(--red);color:#ef5350}
+
+/* Inline edit */
+.inline-edit{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:.5rem;color:var(--parchment);font-family:'Inter',sans-serif;font-size:.85rem;resize:vertical;min-height:60px}
+.inline-edit:focus{outline:none;border-color:var(--gold)}
+.inline-select{background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:.3rem .5rem;color:var(--parchment-dim);font-size:.78rem;font-family:'Inter',sans-serif}
+
+/* Empty state */
+.empty-state{text-align:center;padding:3rem 1rem;color:var(--parchment-dim)}
+.empty-state .icon{font-size:2.5rem;margin-bottom:.75rem}
+.empty-state p{font-size:.9rem}
+
+/* Tab panel */
+.tab-panel{display:none}.tab-panel.active{display:block}
+
+/* Footer */
+footer{text-align:center;padding:2.5rem 1.5rem;margin-top:3rem;border-top:1px solid var(--surface-border);color:var(--parchment-dim);font-size:.8rem}
+footer a{color:var(--gold-dim)}
+footer .links{display:flex;justify-content:center;gap:1.5rem;margin-top:.75rem;flex-wrap:wrap}
+
+/* Toast */
+.toast{position:fixed;bottom:60px;right:16px;background:var(--surface);border:1px solid var(--gold);color:var(--parchment);padding:.6rem 1rem;border-radius:8px;font-size:.8rem;z-index:9999;opacity:0;transform:translateY(10px);transition:all .3s;pointer-events:none}
+.toast.show{opacity:1;transform:translateY(0)}
+
+@media(max-width:600px){
+.quick-add{flex-direction:column}.quick-add input[type="text"],.quick-add select,.quick-add button{width:100%}
+.tab-btn{padding:.6rem .7rem;font-size:.78rem}
+.entry-header{flex-direction:column}
+}
+</style>
+</head>
+<body>
+
+<nav>
+<div class="nav-inner">
+<div class="nav-brand">⚜ Lineage</div>
+<div class="nav-links">
+<a href="index.html">Home</a>
+<a href="converter.html">GEDCOM Converter</a>
+<a href="research.html" class="active">Research</a>
+<a href="documents.html">Documents</a>
+<a href="tree.html">Family Tree</a>
+</div>
+</div>
+</nav>
+
+<div class="container">
+
+<section class="page-header">
+<h1>📓 <span>Research</span> Journal</h1>
+<p class="tagline">Capture everything. Search nothing twice. Break every wall.</p>
+</section>
+
+<!-- Quick Add -->
+<div class="quick-add">
+<input type="text" id="quickInput" placeholder="Quick capture — new clue, hunch, or task…" autocomplete="off">
+<select id="quickType">
+<option value="inbox">📥 Inbox</option>
+<option value="task">🔬 Task</option>
+<option value="brick_wall">🧱 Brick Wall</option>
+<option value="search">🔍 Search Log</option>
+<option value="waiting">⏳ Waiting</option>
+</select>
+<select id="quickFamily">
+<option value="">All Lines</option>
+<option value="brown">BROWN</option>
+<option value="chaney">CHANEY</option>
+<option value="crawley">CRAWLEY</option>
+<option value="hess">HESS</option>
+</select>
+<button id="quickAdd">Add ↵</button>
+</div>
+
+<!-- Filters -->
+<div class="filters">
+<div class="filter-pills" id="familyFilter">
+<div class="pill active" data-family="">All</div>
+<div class="pill" data-family="brown">BROWN</div>
+<div class="pill" data-family="chaney">CHANEY</div>
+<div class="pill" data-family="crawley">CRAWLEY</div>
+<div class="pill" data-family="hess">HESS</div>
+</div>
+<select class="filter-select" id="sortBy">
+<option value="newest">Newest first</option>
+<option value="oldest">Oldest first</option>
+<option value="priority">Priority</option>
+<option value="family">Family line</option>
+</select>
+</div>
+
+<!-- Tabs -->
+<div class="tabs">
+<button class="tab-btn active" data-tab="inbox">📥 Inbox <span class="tab-count" id="count-inbox">0</span></button>
+<button class="tab-btn" data-tab="task">🔬 Active <span class="tab-count" id="count-task">0</span></button>
+<button class="tab-btn" data-tab="brick_wall">🧱 Brick Walls <span class="tab-count" id="count-brick_wall">0</span></button>
+<button class="tab-btn" data-tab="search">🔍 Search Log <span class="tab-count" id="count-search">0</span></button>
+<button class="tab-btn" data-tab="waiting">⏳ Waiting <span class="tab-count" id="count-waiting">0</span></button>
+</div>
+
+<!-- Tab Panels -->
+<div class="tab-panel active" id="panel-inbox"></div>
+<div class="tab-panel" id="panel-task"></div>
+<div class="tab-panel" id="panel-brick_wall"></div>
+<div class="tab-panel" id="panel-search"></div>
+<div class="tab-panel" id="panel-waiting"></div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<footer>
+<div>Built with <strong style="color:var(--gold)">Lineage</strong> · Evidence-based genealogy research</div>
+<div class="links">
+<a href="index.html">Home</a>
+<a href="converter.html">GEDCOM Converter</a>
+<a href="research.html">Research</a>
+<a href="documents.html">Documents</a>
+<a href="tree.html">Family Tree</a>
+</div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script>
+(function(){
+
+/* ── State ── */
+let db = null;
+let entries = []; // all research_log entries
+let activeTab = 'inbox';
+let activeFamily = '';
+let sortMode = 'newest';
+const statusEl = createConnectionIndicator();
+
+/* ── DB Schema mapping ──
+   Columns: id, family_line, individual_id, activity_type, description (NOT NULL), sources_consulted (array), outcome (text), agent, created_at
+   
+   We use:
+   - activity_type: inbox | task | brick_wall | search | waiting
+   - description: main text (NOT NULL)
+   - outcome: JSON string with structured metadata per type
+     For task: { priority, status, question, where_to_search, findings }
+     For brick_wall: { missing, tried, difficulty, last_attempted }
+     For search: { repository, query, result, search_date }
+     For waiting: { expected_date, status, details }
+     For inbox: { promoted_to }
+   - sources_consulted: array of source strings
+   - family_line, individual_id: as-is
+   - agent: 'user' for manual entries
+*/
+
+function parseOutcome(str) {
+  if (!str) return {};
+  try { return JSON.parse(str); } catch(e) { return { text: str }; }
+}
+
+function serializeOutcome(obj) {
+  return JSON.stringify(obj);
+}
+
+/* ── Init ── */
+async function init() {
+  db = initSupabase();
+  if (db) {
+    try {
+      await loadEntries();
+      setConnectionStatus(statusEl, 'connected');
+    } catch(e) {
+      console.warn('Supabase error:', e);
+      setConnectionStatus(statusEl, 'error');
+      loadFromLocal();
+    }
+  } else {
+    setConnectionStatus(statusEl, 'error');
+    loadFromLocal();
+  }
+  
+  // Check URL params
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('family')) {
+    activeFamily = params.get('family');
+    document.querySelectorAll('#familyFilter .pill').forEach(p => {
+      p.classList.toggle('active', p.dataset.family === activeFamily);
+    });
+  }
+  if (params.get('tab')) {
+    activeTab = params.get('tab');
+  }
+  
+  renderAll();
+  bindEvents();
+}
+
+async function loadEntries() {
+  const { data, error } = await db.from('research_log').select('*').order('created_at', { ascending: false });
+  if (error) throw error;
+  entries = data || [];
+  saveToLocal();
+}
+
+function loadFromLocal() {
+  try {
+    entries = JSON.parse(localStorage.getItem('lineage_research_log') || '[]');
+  } catch(e) { entries = []; }
+}
+
+function saveToLocal() {
+  localStorage.setItem('lineage_research_log', JSON.stringify(entries));
+}
+
+/* ── CRUD ── */
+async function addEntry(type, description, familyLine, individualId, outcomeObj) {
+  const record = {
+    activity_type: type,
+    description: description,
+    family_line: familyLine || null,
+    individual_id: individualId || null,
+    outcome: outcomeObj ? serializeOutcome(outcomeObj) : null,
+    sources_consulted: [],
+    agent: 'user'
+  };
+  
+  if (db) {
+    try {
+      const { data, error } = await db.from('research_log').insert(record).select().single();
+      if (error) throw error;
+      entries.unshift(data);
+      saveToLocal();
+      toast('✓ Added');
+    } catch(e) {
+      console.error(e);
+      // Fallback to local
+      record.id = Date.now();
+      record.created_at = new Date().toISOString();
+      record._local = true;
+      entries.unshift(record);
+      saveToLocal();
+      toast('Saved locally');
+    }
+  } else {
+    record.id = Date.now();
+    record.created_at = new Date().toISOString();
+    record._local = true;
+    entries.unshift(record);
+    saveToLocal();
+    toast('Saved locally');
+  }
+  renderAll();
+}
+
+async function updateEntry(id, updates) {
+  const idx = entries.findIndex(e => e.id === id);
+  if (idx < 0) return;
+  
+  if (db && !entries[idx]._local) {
+    try {
+      const { error } = await db.from('research_log').update(updates).eq('id', id);
+      if (error) throw error;
+      Object.assign(entries[idx], updates);
+      saveToLocal();
+      toast('✓ Updated');
+    } catch(e) {
+      console.error(e);
+      Object.assign(entries[idx], updates);
+      saveToLocal();
+      toast('Updated locally');
+    }
+  } else {
+    Object.assign(entries[idx], updates);
+    saveToLocal();
+    toast('Updated locally');
+  }
+  renderAll();
+}
+
+async function deleteEntry(id) {
+  if (!confirm('Delete this entry?')) return;
+  if (db) {
+    try {
+      await db.from('research_log').delete().eq('id', id);
+    } catch(e) { console.error(e); }
+  }
+  entries = entries.filter(e => e.id !== id);
+  saveToLocal();
+  toast('Deleted');
+  renderAll();
+}
+
+async function promoteEntry(id, newType) {
+  const entry = entries.find(e => e.id === id);
+  if (!entry) return;
+  const outcome = parseOutcome(entry.outcome);
+  outcome.promoted_from = entry.activity_type;
+  await updateEntry(id, { activity_type: newType, outcome: serializeOutcome(outcome) });
+}
+
+/* ── Filtering & Sorting ── */
+function getFiltered(type) {
+  let list = entries.filter(e => e.activity_type === type);
+  if (activeFamily) list = list.filter(e => e.family_line === activeFamily);
+  
+  if (sortMode === 'newest') list.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+  else if (sortMode === 'oldest') list.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+  else if (sortMode === 'priority') {
+    const pOrder = { high: 0, medium: 1, low: 2 };
+    list.sort((a, b) => {
+      const pa = pOrder[parseOutcome(a.outcome).priority] ?? 3;
+      const pb = pOrder[parseOutcome(b.outcome).priority] ?? 3;
+      return pa - pb;
+    });
+  } else if (sortMode === 'family') {
+    list.sort((a, b) => (a.family_line || 'zzz').localeCompare(b.family_line || 'zzz'));
+  }
+  return list;
+}
+
+/* ── Rendering ── */
+function renderAll() {
+  // Update tab counts
+  ['inbox', 'task', 'brick_wall', 'search', 'waiting'].forEach(type => {
+    const count = getFiltered(type).length;
+    const el = document.getElementById('count-' + type);
+    if (el) el.textContent = count;
+  });
+  
+  // Activate correct tab
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === activeTab));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'panel-' + activeTab));
+  
+  // Render active panel
+  renderPanel(activeTab);
+}
+
+function fmtDate(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  const now = new Date();
+  const diff = now - d;
+  if (diff < 86400000) return 'Today';
+  if (diff < 172800000) return 'Yesterday';
+  if (diff < 604800000) return d.toLocaleDateString('en-US', { weekday: 'short' });
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: d.getFullYear() !== now.getFullYear() ? 'numeric' : undefined });
+}
+
+function esc(s) { if (!s) return ''; const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+function renderPanel(type) {
+  const panel = document.getElementById('panel-' + type);
+  const items = getFiltered(type);
+  
+  if (!items.length) {
+    const msgs = {
+      inbox: ['📥', 'Inbox empty — capture your next clue above'],
+      task: ['🔬', 'No active research tasks — promote items from Inbox'],
+      brick_wall: ['🧱', 'No brick walls logged yet — that\'s either great news or you haven\'t started'],
+      search: ['🔍', 'No searches logged — track what you\'ve already looked through'],
+      waiting: ['⏳', 'Nothing pending — all clear']
+    };
+    const [icon, msg] = msgs[type] || ['📋', 'No entries'];
+    panel.innerHTML = `<div class="empty-state"><div class="icon">${icon}</div><p>${msg}</p></div>`;
+    return;
+  }
+  
+  panel.innerHTML = items.map(e => renderCard(e, type)).join('');
+  
+  // Bind card interactions
+  panel.querySelectorAll('.entry-header').forEach(h => {
+    h.addEventListener('click', () => h.closest('.entry-card').classList.toggle('expanded'));
+  });
+}
+
+function renderCard(entry, type) {
+  const meta = parseOutcome(entry.outcome);
+  const id = entry.id;
+  const familyBadge = entry.family_line ? `<span class="entry-family">${esc(entry.family_line.toUpperCase())}</span>` : '';
+  const dateBadge = `<span class="entry-date">${fmtDate(entry.created_at)}</span>`;
+  
+  let headerExtra = '';
+  let bodyContent = '';
+  let actions = '';
+  
+  if (type === 'inbox') {
+    actions = `<div class="entry-actions">
+      <button class="action-btn" onclick="app.promote(${id},'task')">→ Task</button>
+      <button class="action-btn" onclick="app.promote(${id},'brick_wall')">→ Brick Wall</button>
+      <button class="action-btn" onclick="app.promote(${id},'search')">→ Search Log</button>
+      <button class="action-btn" onclick="app.promote(${id},'waiting')">→ Waiting</button>
+      <button class="action-btn danger" onclick="app.del(${id})">✕ Delete</button>
+    </div>`;
+    bodyContent = `<div style="margin-bottom:.5rem">
+      <label style="font-size:.72rem;color:var(--parchment-dim)">Individual</label>
+      <input class="inline-edit" style="min-height:auto;padding:.3rem .5rem" value="${esc(entry.individual_id||'')}" onchange="app.upd(${id},{individual_id:this.value})">
+    </div>${actions}`;
+  }
+  
+  else if (type === 'task') {
+    const pr = meta.priority || 'medium';
+    const st = meta.status || 'not-started';
+    headerExtra = `<span class="priority priority-${pr}">${pr}</span><span class="status status-${st}">${st.replace(/-/g,' ')}</span>`;
+    bodyContent = `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.75rem">
+        <div><label style="font-size:.72rem;color:var(--parchment-dim)">Priority</label>
+        <select class="inline-select" onchange="app.updMeta(${id},{priority:this.value})">
+          <option value="high" ${pr==='high'?'selected':''}>High</option>
+          <option value="medium" ${pr==='medium'?'selected':''}>Medium</option>
+          <option value="low" ${pr==='low'?'selected':''}>Low</option>
+        </select></div>
+        <div><label style="font-size:.72rem;color:var(--parchment-dim)">Status</label>
+        <select class="inline-select" onchange="app.updMeta(${id},{status:this.value})">
+          <option value="not-started" ${st==='not-started'?'selected':''}>Not Started</option>
+          <option value="in-progress" ${st==='in-progress'?'selected':''}>In Progress</option>
+          <option value="found-something" ${st==='found-something'?'selected':''}>Found Something</option>
+          <option value="dead-end" ${st==='dead-end'?'selected':''}>Dead End</option>
+        </select></div>
+      </div>
+      <div style="margin-bottom:.5rem"><label style="font-size:.72rem;color:var(--parchment-dim)">Where to search</label>
+      <input class="inline-edit" style="min-height:auto;padding:.3rem .5rem" value="${esc(meta.where_to_search||'')}" onchange="app.updMeta(${id},{where_to_search:this.value})"></div>
+      <div style="margin-bottom:.5rem"><label style="font-size:.72rem;color:var(--parchment-dim)">Findings / Notes</label>
+      <textarea class="inline-edit" onchange="app.updMeta(${id},{findings:this.value})">${esc(meta.findings||'')}</textarea></div>
+      <div class="entry-actions">
+        <button class="action-btn" onclick="app.promote(${id},'brick_wall')">→ Brick Wall</button>
+        <button class="action-btn danger" onclick="app.del(${id})">✕ Delete</button>
+      </div>`;
+  }
+  
+  else if (type === 'brick_wall') {
+    const diff = meta.difficulty || 3;
+    const bricks = '🧱'.repeat(diff) + '<span style="opacity:.2">' + '🧱'.repeat(5-diff) + '</span>';
+    headerExtra = `<span class="bricks">${bricks}</span>`;
+    bodyContent = `
+      <div style="margin-bottom:.5rem"><label style="font-size:.72rem;color:var(--parchment-dim)">What's missing</label>
+      <textarea class="inline-edit" onchange="app.updMeta(${id},{missing:this.value})">${esc(meta.missing||'')}</textarea></div>
+      <div style="margin-bottom:.5rem"><label style="font-size:.72rem;color:var(--parchment-dim)">What's been tried</label>
+      <textarea class="inline-edit" onchange="app.updMeta(${id},{tried:this.value})">${esc(meta.tried||'')}</textarea></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.5rem">
+        <div><label style="font-size:.72rem;color:var(--parchment-dim)">Difficulty (1-5)</label>
+        <select class="inline-select" onchange="app.updMeta(${id},{difficulty:parseInt(this.value)})">
+          ${[1,2,3,4,5].map(n => `<option value="${n}" ${diff===n?'selected':''}>${n} ${'🧱'.repeat(n)}</option>`).join('')}
+        </select></div>
+        <div><label style="font-size:.72rem;color:var(--parchment-dim)">Last attempted</label>
+        <input type="date" class="inline-select" value="${esc(meta.last_attempted||'')}" onchange="app.updMeta(${id},{last_attempted:this.value})" style="color-scheme:dark"></div>
+      </div>
+      <div class="entry-actions"><button class="action-btn danger" onclick="app.del(${id})">✕ Delete</button></div>`;
+  }
+  
+  else if (type === 'search') {
+    const result = meta.result || 'nothing';
+    headerExtra = `<span class="result-badge result-${result}">${result}</span>`;
+    bodyContent = `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.5rem">
+        <div><label style="font-size:.72rem;color:var(--parchment-dim)">Repository</label>
+        <input class="inline-edit" style="min-height:auto;padding:.3rem .5rem" value="${esc(meta.repository||'')}" onchange="app.updMeta(${id},{repository:this.value})"></div>
+        <div><label style="font-size:.72rem;color:var(--parchment-dim)">Result</label>
+        <select class="inline-select" onchange="app.updMeta(${id},{result:this.value})">
+          <option value="found" ${result==='found'?'selected':''}>Found</option>
+          <option value="partial" ${result==='partial'?'selected':''}>Partial</option>
+          <option value="nothing" ${result==='nothing'?'selected':''}>Nothing</option>
+        </select></div>
+      </div>
+      <div style="margin-bottom:.5rem"><label style="font-size:.72rem;color:var(--parchment-dim)">Search query / details</label>
+      <textarea class="inline-edit" onchange="app.updMeta(${id},{query:this.value})">${esc(meta.query||'')}</textarea></div>
+      <div class="entry-actions"><button class="action-btn danger" onclick="app.del(${id})">✕ Delete</button></div>`;
+  }
+  
+  else if (type === 'waiting') {
+    const st = meta.status || 'pending';
+    headerExtra = `<span class="status status-${st}">${st}</span>`;
+    bodyContent = `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.5rem">
+        <div><label style="font-size:.72rem;color:var(--parchment-dim)">Status</label>
+        <select class="inline-select" onchange="app.updMeta(${id},{status:this.value})">
+          <option value="pending" ${st==='pending'?'selected':''}>Pending</option>
+          <option value="received" ${st==='received'?'selected':''}>Received</option>
+          <option value="overdue" ${st==='overdue'?'selected':''}>Overdue</option>
+        </select></div>
+        <div><label style="font-size:.72rem;color:var(--parchment-dim)">Expected date</label>
+        <input type="date" class="inline-select" value="${esc(meta.expected_date||'')}" onchange="app.updMeta(${id},{expected_date:this.value})" style="color-scheme:dark"></div>
+      </div>
+      <div style="margin-bottom:.5rem"><label style="font-size:.72rem;color:var(--parchment-dim)">Details</label>
+      <textarea class="inline-edit" onchange="app.updMeta(${id},{details:this.value})">${esc(meta.details||'')}</textarea></div>
+      <div class="entry-actions"><button class="action-btn danger" onclick="app.del(${id})">✕ Delete</button></div>`;
+  }
+  
+  return `<div class="entry-card" data-id="${id}">
+    <div class="entry-header">
+      <div class="entry-title">${esc(entry.description)}</div>
+      <div class="entry-meta">${headerExtra}${familyBadge}${dateBadge}</div>
+    </div>
+    <div class="entry-body">${bodyContent}</div>
+  </div>`;
+}
+
+/* ── Toast ── */
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2000);
+}
+
+/* ── Events ── */
+function bindEvents() {
+  // Quick add
+  document.getElementById('quickAdd').addEventListener('click', quickAddHandler);
+  document.getElementById('quickInput').addEventListener('keydown', e => { if (e.key === 'Enter') quickAddHandler(); });
+  
+  // Tab switching
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => { activeTab = btn.dataset.tab; renderAll(); });
+  });
+  
+  // Family filter
+  document.querySelectorAll('#familyFilter .pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+      document.querySelectorAll('#familyFilter .pill').forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      activeFamily = pill.dataset.family;
+      renderAll();
+    });
+  });
+  
+  // Sort
+  document.getElementById('sortBy').addEventListener('change', e => { sortMode = e.target.value; renderAll(); });
+}
+
+function quickAddHandler() {
+  const input = document.getElementById('quickInput');
+  const text = input.value.trim();
+  if (!text) return;
+  const type = document.getElementById('quickType').value;
+  const family = document.getElementById('quickFamily').value;
+  
+  let outcome = {};
+  if (type === 'task') outcome = { priority: 'medium', status: 'not-started' };
+  else if (type === 'brick_wall') outcome = { difficulty: 3 };
+  else if (type === 'search') outcome = { result: 'nothing', repository: '' };
+  else if (type === 'waiting') outcome = { status: 'pending' };
+  
+  addEntry(type, text, family, null, Object.keys(outcome).length ? outcome : null);
+  input.value = '';
+  input.focus();
+  
+  // Switch to the appropriate tab
+  activeTab = type;
+  renderAll();
+}
+
+/* ── Global API for inline handlers ── */
+window.app = {
+  del: deleteEntry,
+  promote: promoteEntry,
+  upd: (id, updates) => updateEntry(id, updates),
+  updMeta: (id, metaUpdates) => {
+    const entry = entries.find(e => e.id === id);
+    if (!entry) return;
+    const current = parseOutcome(entry.outcome);
+    Object.assign(current, metaUpdates);
+    updateEntry(id, { outcome: serializeOutcome(current) });
+  }
+};
+
+init();
+})();
+</script>
+</body>
+</html>

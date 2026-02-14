@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Person Research — Lineage Research Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d0d14;--surface:#1a1a2e;--surface2:#222240;--gold:#c5960c;--gold-dim:#a07a0a;
+  --parchment:#f5f0e8;--text:#e0dcd4;--text-dim:#9994;--green:#2e7d32;--amber:#d4760a;
+  --red:#c62828;--yellow-green:#7cb342;--border:#333355;
+}
+html{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:16px;line-height:1.6}
+body{min-height:100vh}
+a{color:var(--gold);text-decoration:none}a:hover{text-decoration:underline}
+
+/* NAV */
+.nav{background:var(--surface);border-bottom:1px solid var(--border);padding:.75rem 1.5rem;display:flex;align-items:center;gap:2rem;flex-wrap:wrap}
+.nav-brand{font-family:'Playfair Display',serif;font-size:1.15rem;color:var(--gold);font-weight:700;white-space:nowrap}
+.nav-links{display:flex;gap:1.25rem;flex-wrap:wrap}
+.nav-links a{color:var(--text-dim);font-size:.85rem;font-weight:500;transition:color .2s}
+.nav-links a:hover,.nav-links a.active{color:var(--gold);text-decoration:none}
+
+/* HEADER */
+.person-header{max-width:960px;margin:0 auto;padding:2rem 1.5rem 1rem}
+.person-name{font-family:'Playfair Display',serif;font-size:2.4rem;font-weight:700;color:var(--parchment);line-height:1.2}
+.person-dates{font-size:1.1rem;color:var(--text-dim);margin-top:.25rem}
+.person-relation{font-size:.9rem;color:var(--gold);margin-top:.35rem;font-weight:500}
+.progress-row{margin-top:1rem;display:flex;align-items:center;gap:.75rem}
+.progress-bar{flex:1;max-width:300px;height:8px;background:var(--surface2);border-radius:4px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--amber));border-radius:4px;transition:width .6s}
+.progress-label{font-size:.8rem;color:var(--text-dim);font-weight:600}
+.quick-stats{margin-top:.75rem;display:flex;gap:1.5rem;flex-wrap:wrap;font-size:.85rem;color:var(--text-dim)}
+.quick-stats span{background:var(--surface);padding:.3rem .7rem;border-radius:6px;border:1px solid var(--border)}
+
+/* TABS */
+.tabs-bar{max-width:960px;margin:0 auto;padding:0 1.5rem;display:flex;gap:0;border-bottom:2px solid var(--border);overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tab-btn{background:none;border:none;color:var(--text-dim);font-family:'Inter',sans-serif;font-size:.9rem;font-weight:500;padding:.75rem 1.25rem;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;transition:color .2s,border-color .2s}
+.tab-btn:hover{color:var(--parchment)}
+.tab-btn.active{color:var(--gold);border-bottom-color:var(--gold)}
+
+/* CONTENT */
+.tab-content{max-width:960px;margin:0 auto;padding:1.5rem}
+.tab-panel{display:none}.tab-panel.active{display:block}
+
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1.25rem;margin-bottom:1rem}
+.card h3{font-family:'Playfair Display',serif;font-size:1.15rem;color:var(--parchment);margin-bottom:.75rem}
+.card h4{font-size:.95rem;color:var(--gold);margin-bottom:.5rem;font-weight:600}
+
+/* NARRATIVE */
+.narrative{font-size:1rem;line-height:1.8;color:var(--text)}
+.narrative .unverified{font-style:italic;color:var(--amber)}
+
+/* TABLE */
+.facts-table{width:100%;border-collapse:collapse;font-size:.85rem;margin-top:.5rem}
+.facts-table th{text-align:left;color:var(--gold);font-weight:600;padding:.5rem .75rem;border-bottom:1px solid var(--border)}
+.facts-table td{padding:.5rem .75rem;border-bottom:1px solid var(--border);vertical-align:top}
+.facts-table tr:last-child td{border-bottom:none}
+.badge{display:inline-block;padding:.15rem .5rem;border-radius:4px;font-size:.75rem;font-weight:600;white-space:nowrap}
+.badge-proven{background:rgba(46,125,50,.2);color:#66bb6a}
+.badge-probable{background:rgba(124,179,66,.2);color:#aed581}
+.badge-possible{background:rgba(212,118,10,.2);color:#ffb74d}
+.badge-questionable{background:rgba(198,40,40,.2);color:#ef5350}
+.badge-unknown{background:rgba(150,150,150,.2);color:#999}
+
+/* TIMELINE */
+.timeline{position:relative;padding-left:2.5rem;margin-top:.5rem}
+.timeline::before{content:'';position:absolute;left:.9rem;top:0;bottom:0;width:2px;background:var(--border)}
+.tl-event{position:relative;margin-bottom:1.5rem}
+.tl-dot{position:absolute;left:-1.6rem;top:.35rem;width:14px;height:14px;border-radius:50%;border:2px solid var(--border);background:var(--surface)}
+.tl-dot.proven{border-color:var(--green);background:rgba(46,125,50,.3)}
+.tl-dot.probable{border-color:var(--yellow-green);background:rgba(124,179,66,.3)}
+.tl-dot.possible{border-color:var(--amber);background:rgba(212,118,10,.3)}
+.tl-date{font-size:.8rem;color:var(--gold);font-weight:600}
+.tl-desc{font-size:.9rem;color:var(--parchment);margin-top:.15rem}
+.tl-location{font-size:.8rem;color:var(--text-dim)}
+.tl-source{font-size:.75rem;color:var(--text-dim);font-style:italic;margin-top:.15rem}
+.tl-icon{margin-right:.35rem}
+
+/* CLAIMS */
+.claim-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1rem 1.25rem;margin-bottom:1rem}
+.claim-text{font-size:.95rem;color:var(--parchment);font-weight:500}
+.claim-meta{font-size:.8rem;color:var(--text-dim);margin-top:.5rem;display:flex;flex-direction:column;gap:.25rem}
+.claim-evidence{background:var(--surface2);padding:.6rem .75rem;border-radius:6px;font-size:.85rem;color:var(--text);margin-top:.5rem;border-left:3px solid var(--gold)}
+.claim-notes{margin-top:.5rem}
+.claim-notes textarea{width:100%;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:.5rem;font-family:'Inter',sans-serif;font-size:.8rem;resize:vertical;min-height:50px}
+.claim-notes textarea:focus{outline:none;border-color:var(--gold)}
+
+/* DOCUMENTS */
+.doc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem}
+.doc-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;transition:border-color .2s}
+.doc-card:hover{border-color:var(--gold)}
+.doc-thumb{height:140px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:2.5rem;color:var(--text-dim)}
+.doc-info{padding:.75rem}
+.doc-info .type-badge{font-size:.7rem;font-weight:600;text-transform:uppercase;padding:.15rem .4rem;border-radius:3px;background:rgba(197,150,12,.15);color:var(--gold)}
+.doc-info .doc-title{font-size:.85rem;color:var(--parchment);margin-top:.35rem}
+.doc-info .doc-repo{font-size:.75rem;color:var(--text-dim)}
+.drop-zone{border:2px dashed var(--border);border-radius:10px;padding:2rem;text-align:center;color:var(--text-dim);margin-top:1rem;transition:border-color .2s}
+.drop-zone:hover,.drop-zone.dragover{border-color:var(--gold);color:var(--gold)}
+
+/* RESEARCH */
+.brick-wall{background:rgba(212,118,10,.08);border:1px solid rgba(212,118,10,.3);border-radius:10px;padding:1rem 1.25rem;margin-bottom:1rem}
+.brick-wall h4{color:var(--amber);font-size:.95rem}
+.brick-wall p{font-size:.85rem;color:var(--text);margin-top:.35rem}
+.suggestion{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1rem 1.25rem;margin-bottom:.75rem}
+.suggestion .step-num{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:var(--gold);color:var(--bg);font-size:.75rem;font-weight:700;margin-right:.5rem;flex-shrink:0}
+.suggestion p{font-size:.9rem;color:var(--text);display:inline}
+.suggestion .search-links{margin-top:.5rem;display:flex;gap:.5rem;flex-wrap:wrap}
+.suggestion .search-links a{font-size:.8rem;padding:.3rem .65rem;background:rgba(197,150,12,.12);border:1px solid var(--gold-dim);border-radius:5px;color:var(--gold);font-weight:500;transition:background .2s}
+.suggestion .search-links a:hover{background:rgba(197,150,12,.25);text-decoration:none}
+.research-log textarea{width:100%;min-height:180px;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:.75rem;font-family:'Inter',sans-serif;font-size:.85rem;resize:vertical}
+.research-log textarea:focus{outline:none;border-color:var(--gold)}
+.research-log .save-status{font-size:.75rem;color:var(--green);margin-top:.35rem}
+
+/* FAMILY */
+.pedigree{display:flex;flex-direction:column;align-items:center;gap:.5rem;padding:1rem 0}
+.ped-row{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;justify-content:center}
+.ped-person{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:.6rem 1rem;text-align:center;cursor:pointer;transition:border-color .2s;min-width:180px}
+.ped-person:hover{border-color:var(--gold)}
+.ped-person.unknown{border-style:dashed;opacity:.6}
+.ped-person .ped-name{font-family:'Playfair Display',serif;font-size:.95rem;color:var(--parchment)}
+.ped-person .ped-dates{font-size:.75rem;color:var(--text-dim)}
+.ped-connector{color:var(--border);font-size:1.5rem;line-height:1}
+.ped-line-down{width:2px;height:30px;background:var(--border);margin:0 auto}
+.research-btn{font-size:.7rem;background:var(--amber);color:#fff;border:none;border-radius:4px;padding:.2rem .5rem;cursor:pointer;margin-top:.25rem}
+
+/* UTILITY */
+.section-title{font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--parchment);margin-bottom:1rem}
+.mt-1{margin-top:1rem}.mt-2{margin-top:1.5rem}
+.loading{text-align:center;padding:3rem;color:var(--text-dim);font-size:1.1rem}
+.error{text-align:center;padding:3rem;color:var(--red);font-size:1rem}
+
+@media(max-width:600px){
+  .person-name{font-size:1.6rem}
+  .tab-btn{padding:.6rem .8rem;font-size:.8rem}
+  .facts-table{font-size:.75rem}
+  .facts-table th,.facts-table td{padding:.35rem .4rem}
+  .doc-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+  .ped-person{min-width:140px;padding:.5rem .6rem}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-brand">🔬 Lineage Research Hub</div>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="converter.html">GEDCOM Converter</a>
+    <a href="research.html">Research</a>
+    <a href="documents.html">Documents</a>
+    <a href="tree.html">Family Tree</a>
+    <a href="person.html" class="active">Person</a>
+  </div>
+</nav>
+
+<div id="app">
+  <div class="loading" id="loading">Loading research file…</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script>
+(function(){
+
+const params = new URLSearchParams(window.location.search);
+const personId = params.get('id') || 'ind_raymond_mb';
+
+const CONFIDENCE_MAP = {
+  proven:      { emoji:'🟢', label:'Proven',       cls:'badge-proven' },
+  probable:    { emoji:'🟡', label:'Probable',      cls:'badge-probable' },
+  possible:    { emoji:'🟠', label:'Possible',      cls:'badge-possible' },
+  questionable:{ emoji:'🔴', label:'Questionable',  cls:'badge-questionable' },
+  unknown:     { emoji:'⚪', label:'Unknown',       cls:'badge-unknown' }
+};
+
+const EVENT_ICONS = {birth:'👶',death:'⚰️',military_service:'🎖️',residence:'🏠',occupation:'🔧',marriage:'💍',census:'📋',immigration:'🚢',burial:'⚱️',baptism:'✝️'};
+
+function badge(conf){ const c=CONFIDENCE_MAP[conf]||CONFIDENCE_MAP.unknown; return `<span class="badge ${c.cls}">${c.emoji} ${c.label}</span>`; }
+function esc(s){ if(!s)return''; const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
+function buildSearchUrl(engine, query){
+  if(engine==='familysearch') return `https://www.familysearch.org/search/record/results?q.any=${encodeURIComponent(query)}`;
+  if(engine==='ancestry') return `https://www.ancestry.com/search/?name=${encodeURIComponent(query)}`;
+  if(engine==='newspapers') return `https://www.newspapers.com/search/#query=${encodeURIComponent(query)}`;
+  if(engine==='nprc') return 'https://www.archives.gov/veterans/military-service-records';
+  if(engine==='1920census') return `https://www.familysearch.org/search/record/results?q.any=${encodeURIComponent(query)}&f.collectionId=1488411`;
+  if(engine==='1930census') return `https://www.familysearch.org/search/record/results?q.any=${encodeURIComponent(query)}&f.collectionId=1810731`;
+  if(engine==='1940census') return `https://www.familysearch.org/search/record/results?q.any=${encodeURIComponent(query)}&f.collectionId=2000219`;
+  return '#';
+}
+
+const statusEl = createConnectionIndicator();
+
+// ── Supabase data loader ──
+async function loadFromSupabase() {
+  const db = initSupabase();
+  if (!db) throw new Error('No Supabase client');
+
+  // Fetch individual
+  const { data: person, error: pe } = await db.from('individuals').select('*').eq('id', personId).single();
+  if (pe) throw pe;
+
+  // Fetch events linked via claims (event_id) + standalone events
+  const { data: claims, error: ce } = await db.from('claims').select('*').eq('individual_id', personId);
+  if (ce) throw ce;
+
+  const eventIds = claims.filter(c => c.event_id).map(c => c.event_id);
+  let events = [];
+  if (eventIds.length) {
+    const { data: evts } = await db.from('events').select('*').in('id', eventIds);
+    if (evts) events = evts;
+  }
+
+  // Fetch relationships
+  const { data: rels, error: re } = await db.from('relationships').select('*').or(`individual_id.eq.${personId},related_to_id.eq.${personId}`);
+  if (re) throw re;
+
+  // Fetch source ids from claims
+  const sourceIds = [...new Set(claims.filter(c => c.source_id).map(c => c.source_id))];
+  let sources = [];
+  if (sourceIds.length) {
+    const { data: srcs } = await db.from('sources').select('*').in('id', sourceIds);
+    if (srcs) sources = srcs;
+  }
+
+  // Fetch related individuals for family tab
+  const relatedIds = [...new Set(rels.map(r => r.individual_id === personId ? r.related_to_id : r.individual_id))];
+  let relatedPersons = [];
+  if (relatedIds.length) {
+    const { data: rp } = await db.from('individuals').select('*').in('id', relatedIds);
+    if (rp) relatedPersons = rp;
+  }
+
+  setConnectionStatus(statusEl, 'connected');
+  return { person, claims, events, relationships: rels, sources, relatedPersons };
+}
+
+// ── JSON fallback loader ──
+async function loadFromJSON() {
+  const res = await fetch(LINEAGE_CONFIG.fallbackDataPath);
+  if (!res.ok) throw new Error('fetch failed');
+  const data = await res.json();
+
+  const person = data.individuals.find(i => i.individual_id === personId);
+  if (!person) throw new Error('Person not found in JSON');
+
+  // Convert JSON format to Supabase-like format
+  const ind = {
+    id: person.individual_id,
+    given_name: person.name.given,
+    middle_name: person.name.middle,
+    surname: person.name.surname,
+    suffix: person.name.suffix,
+    maiden_name: person.name.maiden,
+    aliases: person.name.aliases || [],
+    sex: person.sex,
+    living: person.living,
+    research_status: person.research_status,
+    research_notes: (person.brick_walls || []).join('\n'),
+    narrative: null,
+    family_line: 'brown',
+    generation: null
+  };
+
+  const claims = (data.claims || []).filter(c => c.individual_id === personId).map(c => ({
+    id: c.claim_id,
+    individual_id: c.individual_id,
+    claim_type: c.attribute,
+    claim_value: c.value,
+    source_id: c.source_id,
+    event_id: null,
+    evidence_text: c.evidence,
+    confidence: c.confidence,
+    gps_score: c.gps_score
+  }));
+
+  const events = (data.events || []).filter(e => e.participants.some(p => p.individual_id === personId)).map(e => ({
+    id: e.event_id,
+    type: e.type,
+    date_year: e.date.normalized ? parseInt(e.date.normalized) : null,
+    date_qualifier: e.date.qualifier,
+    place_original: e.place.original,
+    place_state: e.place.state,
+    place_city: e.place.city,
+    confidence: 'possible',
+    description: e.details?.occupation || null,
+    _date_original: e.date.original,
+    _source_ids: e.source_ids
+  }));
+
+  const relationships = (person.relationships || []).map((r, i) => ({
+    id: i,
+    individual_id: personId,
+    related_to_id: r.individual_id,
+    type: r.type === 'parent' ? 'father' : r.type,
+    confidence: 'possible'
+  }));
+
+  const sources = (data.sources || []).map(s => ({
+    id: s.source_id,
+    title: s.title,
+    type: s.type,
+    citation: s.citation,
+    repository: s.repository,
+    confidence: s.confidence
+  }));
+
+  const relatedIds = relationships.map(r => r.related_to_id);
+  const relatedPersons = data.individuals.filter(i => relatedIds.includes(i.individual_id)).map(i => ({
+    id: i.individual_id,
+    given_name: i.name.given,
+    middle_name: i.name.middle,
+    surname: i.name.surname,
+    suffix: i.name.suffix,
+    sex: i.sex,
+    birth_year: null,
+    death_year: null
+  }));
+
+  setConnectionStatus(statusEl, 'fallback');
+  return { person: ind, claims, events, relationships, sources, relatedPersons };
+}
+
+// ── Rendering helpers ──
+function fullName(p) {
+  if (!p) return 'Unknown';
+  return [p.given_name, p.middle_name, p.surname].filter(Boolean).join(' ') || 'Unknown';
+}
+
+function lifeDatesStr(p, events) {
+  const birthEvt = events.find(e => e.type === 'birth');
+  const deathEvt = events.find(e => e.type === 'death');
+  const bs = birthEvt ? (birthEvt._date_original || (birthEvt.date_qualifier === 'about' ? 'c. ' : '') + (birthEvt.date_year || '?')) : '?';
+  const ds = deathEvt ? (deathEvt._date_original || (deathEvt.date_qualifier === 'about' ? 'c. ' : '') + (deathEvt.date_year || '?')) : '?';
+  return `(${bs} – ${ds})`;
+}
+
+function eventDateStr(e) {
+  if (e._date_original) return e._date_original;
+  let s = '';
+  if (e.date_qualifier && e.date_qualifier !== 'exact') s += e.date_qualifier + ' ';
+  s += e.date_year || 'Unknown';
+  return s;
+}
+
+function getSource(sources, id) { return sources.find(s => s.id === id); }
+function getRelated(relatedPersons, id) { return relatedPersons.find(p => p.id === id); }
+
+async function init(){
+  let d;
+  try {
+    d = await loadFromSupabase();
+  } catch(e) {
+    console.warn('Supabase failed, trying JSON fallback:', e.message);
+    try {
+      d = await loadFromJSON();
+    } catch(e2) {
+      document.getElementById('loading').innerHTML = `<div class="error">Failed to load data: ${e2.message}</div>`;
+      setConnectionStatus(statusEl, 'error');
+      return;
+    }
+  }
+
+  const { person, claims, events, relationships, sources, relatedPersons } = d;
+  const name = fullName(person);
+  const dates = lifeDatesStr(person, events);
+
+  // Sort events by year
+  events.sort((a, b) => (a.date_year || 9999) - (b.date_year || 9999));
+
+  // Brick walls from research_notes
+  const brickWalls = person.research_notes ? person.research_notes.split('\n').filter(Boolean) : [];
+  const completeness = claims.length > 0 ? Math.min(100, Math.round(claims.length * 12)) : 0;
+
+  const relation = person.family_line ? `${person.family_line.toUpperCase()} Line` : '';
+  document.title = `${name} — Lineage Research Hub`;
+
+  // Narrative
+  function generateNarrative(){
+    if (person.narrative) return esc(person.narrative);
+    const parts = [];
+    const birthEvt = events.find(e => e.type === 'birth');
+    const deathEvt = events.find(e => e.type === 'death');
+
+    // Find parents from relationships
+    const fatherRel = relationships.find(r => r.type === 'father' && r.individual_id === personId);
+    const motherRel = relationships.find(r => r.type === 'mother' && r.individual_id === personId);
+    // Also check reverse: where this person is child
+    const childRels = relationships.filter(r => r.type === 'child' && r.related_to_id === personId);
+
+    if (birthEvt) parts.push(`${name} was born ${eventDateStr(birthEvt)}${birthEvt.place_original ? ', in ' + birthEvt.place_original : ''}.`);
+
+    const fatherId = fatherRel ? fatherRel.related_to_id : null;
+    const motherId = motherRel ? motherRel.related_to_id : null;
+    if (fatherId || motherId) {
+      const father = fatherId ? getRelated(relatedPersons, fatherId) : null;
+      const mother = motherId ? getRelated(relatedPersons, motherId) : null;
+      const pronoun = person.sex === 'F' ? 'She' : 'He';
+      parts.push(`${pronoun} was the ${person.sex === 'F' ? 'daughter' : 'son'} of ${father ? fullName(father) : 'an unknown father'} and ${mother ? fullName(mother) : 'an unknown mother'}.`);
+    }
+
+    // Claims-based narrative additions
+    const occClaim = claims.find(c => c.claim_type === 'occupation');
+    if (occClaim) parts.push(`<span class="unverified">${name} worked as a ${esc(occClaim.claim_value.toLowerCase())}.</span>`);
+
+    if (deathEvt) parts.push(`<span class="unverified">${name} died ${eventDateStr(deathEvt)}${deathEvt.place_original ? ' in ' + deathEvt.place_original : ''}.</span>`);
+
+    return parts.join(' ') || '<em>No narrative available yet.</em>';
+  }
+
+  // Key facts from claims
+  function factsRows(){
+    return claims.map(c => {
+      const src = getSource(sources, c.source_id);
+      const label = (c.claim_type || '').replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+      let value = c.claim_value || '';
+      // If claim references another individual, resolve name
+      const related = getRelated(relatedPersons, value);
+      if (related) value = fullName(related);
+      return `<tr><td style="color:var(--gold);font-weight:500">${esc(label)}</td><td>${esc(value)}</td><td>${src ? esc(src.title) : '—'}</td><td>${badge(c.confidence)}</td></tr>`;
+    }).join('');
+  }
+
+  // Timeline
+  function timelineHTML(){
+    if (!events.length) return '<p style="color:var(--text-dim)">No events recorded yet.</p>';
+    return events.map(e => {
+      const icon = EVENT_ICONS[e.type] || '📌';
+      const desc = e.type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) + (e.description ? ': ' + e.description : '');
+      const srcText = (e._source_ids || []).map(id => { const s = getSource(sources, id); return s ? s.title : ''; }).filter(Boolean).join(', ');
+      return `<div class="tl-event"><div class="tl-dot ${e.confidence || 'unknown'}"></div><div class="tl-date"><span class="tl-icon">${icon}</span>${esc(eventDateStr(e))}</div><div class="tl-desc">${esc(desc)}</div>${e.place_original ? `<div class="tl-location">📍 ${esc(e.place_original)}</div>` : ''}<div class="tl-source">${esc(srcText)}</div></div>`;
+    }).join('');
+  }
+
+  // Claims tab
+  function claimsHTML(){
+    if (!claims.length) return '<p style="color:var(--text-dim)">No claims recorded yet.</p>';
+    return claims.map(c => {
+      const src = getSource(sources, c.source_id);
+      const storageKey = `claim_note_${c.id}`;
+      const savedNote = localStorage.getItem(storageKey) || '';
+      return `<div class="claim-card">
+        <div class="claim-text">${esc((c.claim_type || '').replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()))}: ${esc(c.claim_value)}</div>
+        <div class="claim-meta">
+          <div>Source: ${src ? `<a href="#">${esc(src.title)}</a>` : 'None'}</div>
+          <div>Confidence: ${badge(c.confidence)}</div>
+          ${c.gps_score ? `<div>GPS Score: ${c.gps_score}</div>` : ''}
+        </div>
+        ${c.evidence_text ? `<div class="claim-evidence">${esc(c.evidence_text)}</div>` : ''}
+        <div class="claim-notes mt-1">
+          <textarea placeholder="Add research notes…" data-claim="${c.id}" onchange="saveCN(this)">${esc(savedNote)}</textarea>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  // Documents
+  function docsHTML(){
+    // Show sources as documents
+    const srcCards = sources.map(s => {
+      const icon = s.type === 'census' ? '📋' : s.type === 'military' ? '🎖️' : s.type === 'newspaper' ? '📰' : s.type === 'vital' ? '📜' : '📄';
+      return `<div class="doc-card"><div class="doc-thumb">${icon}</div><div class="doc-info"><span class="type-badge">${esc(s.type || 'other')}</span><div class="doc-title">${esc(s.title)}</div><div class="doc-repo">${esc(s.repository || '')}</div></div></div>`;
+    }).join('');
+    return `<div class="doc-grid">${srcCards || '<p style="color:var(--text-dim)">No documents yet.</p>'}</div><div class="drop-zone mt-2" id="dropZone">📎 Drop documents here to add to ${esc(name)}'s record</div>`;
+  }
+
+  // Research tab
+  const searchName = `${person.given_name || ''} ${person.surname || ''}`.trim();
+  function researchHTML(){
+    let html = '<h3 class="section-title">🧱 Brick Walls</h3>';
+    if (brickWalls.length) {
+      html += brickWalls.map(w => `<div class="brick-wall"><h4>⚠️ ${esc(w)}</h4></div>`).join('');
+    } else {
+      html += '<p style="color:var(--text-dim)">No brick walls identified yet. Add them via research_notes.</p>';
+    }
+    html += '<h3 class="section-title mt-2">🔍 Suggested Research</h3>';
+    const suggestions = [
+      { text: `Search for ${searchName} on FamilySearch`, links: [{ label: 'FamilySearch', url: buildSearchUrl('familysearch', searchName) }] },
+      { text: `Search for ${searchName} on Ancestry`, links: [{ label: 'Ancestry', url: buildSearchUrl('ancestry', searchName) }] },
+      { text: `Search newspaper records`, links: [{ label: 'Newspapers.com', url: buildSearchUrl('newspapers', searchName) }] }
+    ];
+    html += suggestions.map((s, i) => `<div class="suggestion"><span class="step-num">${i + 1}</span><p>${esc(s.text)}</p><div class="search-links">${s.links.map(l => `<a href="${l.url}" target="_blank" rel="noopener">${esc(l.label)}</a>`).join('')}</div></div>`).join('');
+    const logKey = `research_log_${personId}`;
+    const savedLog = localStorage.getItem(logKey) || '';
+    html += `<h3 class="section-title mt-2">📝 Research Log</h3><div class="research-log"><textarea id="researchLog" placeholder="Log your research here…">${esc(savedLog)}</textarea><div class="save-status" id="logStatus"></div></div>`;
+    return html;
+  }
+
+  // Family tab
+  function familyHTML(){
+    // Find parents (relationships where this person has father/mother type)
+    const fatherRel = relationships.find(r => r.type === 'father' && r.individual_id === personId);
+    const motherRel = relationships.find(r => r.type === 'mother' && r.individual_id === personId);
+    // Also check: this person listed as child of someone
+    const parentRelsReverse = relationships.filter(r => r.type === 'child' && r.related_to_id === personId);
+
+    const fatherId = fatherRel ? fatherRel.related_to_id : null;
+    const motherId = motherRel ? motherRel.related_to_id : null;
+    const fatherInd = fatherId ? getRelated(relatedPersons, fatherId) : null;
+    const motherInd = motherId ? getRelated(relatedPersons, motherId) : null;
+
+    function personCard(ind, fallback){
+      if (!ind) return `<div class="ped-person unknown"><div class="ped-name">${fallback || 'Unknown'}</div><div class="ped-dates">?</div></div>`;
+      const d = ind.birth_year ? `(${ind.birth_year} – ${ind.death_year || '?'})` : '';
+      return `<div class="ped-person" onclick="window.location.href='person.html?id=${ind.id}'"><div class="ped-name">${esc(fullName(ind))}</div><div class="ped-dates">${esc(d)}</div></div>`;
+    }
+
+    // Spouse relationships
+    const spouseRels = relationships.filter(r => r.type === 'spouse');
+    const spouseIds = spouseRels.map(r => r.individual_id === personId ? r.related_to_id : r.individual_id);
+    const spouses = spouseIds.map(id => getRelated(relatedPersons, id)).filter(Boolean);
+
+    // Children
+    const childRels = relationships.filter(r => r.type === 'child' && r.individual_id === personId);
+    const childIds = childRels.map(r => r.related_to_id);
+    const children = childIds.map(id => getRelated(relatedPersons, id)).filter(Boolean);
+
+    let html = '<div class="pedigree">';
+    html += `<div class="ped-row">${personCard(fatherInd, 'Father Unknown')}<span class="ped-connector">──┬──</span>${personCard(motherInd, 'Mother Unknown')}</div>`;
+    html += '<div class="ped-line-down"></div>';
+    html += `<div class="ped-row">${personCard(person)}</div>`;
+    if (spouses.length) {
+      html += '<div class="ped-line-down"></div>';
+      html += `<div class="ped-row">${spouses.map(s => personCard(s)).join('<span class="ped-connector"> · </span>')}</div>`;
+    }
+    if (children.length) {
+      html += '<div class="ped-line-down"></div>';
+      html += `<div class="ped-row">${children.map(c => personCard(c)).join('')}</div>`;
+    }
+    html += '</div>';
+    html += '<p style="text-align:center;font-size:.8rem;color:var(--text-dim);margin-top:1rem">Click any person to view their research page</p>';
+    return html;
+  }
+
+  // RENDER
+  const app = document.getElementById('app');
+  app.innerHTML = `
+    <div class="person-header">
+      <div class="person-name">${esc(name)}</div>
+      <div class="person-dates">${esc(dates)}</div>
+      <div class="person-relation">${esc(relation)}</div>
+      <div class="progress-row"><div class="progress-bar"><div class="progress-fill" style="width:${completeness}%"></div></div><span class="progress-label">${completeness}% Researched</span></div>
+      <div class="quick-stats"><span>${claims.length} Claims</span><span>${sources.length} Sources</span><span>${brickWalls.length} Brick Walls</span></div>
+    </div>
+    <div class="tabs-bar">
+      <button class="tab-btn active" data-tab="summary">Summary</button>
+      <button class="tab-btn" data-tab="timeline">Timeline</button>
+      <button class="tab-btn" data-tab="claims">Claims & Evidence</button>
+      <button class="tab-btn" data-tab="documents">Documents</button>
+      <button class="tab-btn" data-tab="research">Research</button>
+      <button class="tab-btn" data-tab="family">Family</button>
+    </div>
+    <div class="tab-content">
+      <div class="tab-panel active" id="tab-summary">
+        <div class="card"><h3>Biographical Narrative</h3><div class="narrative">${generateNarrative()}</div></div>
+        <div class="card"><h3>Key Facts</h3><table class="facts-table"><thead><tr><th>Fact</th><th>Value</th><th>Source</th><th>Confidence</th></tr></thead><tbody>${factsRows()}</tbody></table></div>
+      </div>
+      <div class="tab-panel" id="tab-timeline"><div class="card"><h3>Life Timeline</h3><div class="timeline">${timelineHTML()}</div></div></div>
+      <div class="tab-panel" id="tab-claims">${claimsHTML()}</div>
+      <div class="tab-panel" id="tab-documents">${docsHTML()}</div>
+      <div class="tab-panel" id="tab-research">${researchHTML()}</div>
+      <div class="tab-panel" id="tab-family"><div class="card"><h3>Family Connections</h3>${familyHTML()}</div></div>
+    </div>`;
+
+  // Tab switching
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    });
+  });
+
+  // Research log auto-save
+  const logEl = document.getElementById('researchLog');
+  if (logEl) {
+    let logTimer;
+    logEl.addEventListener('input', () => {
+      clearTimeout(logTimer);
+      logTimer = setTimeout(() => {
+        localStorage.setItem(`research_log_${personId}`, logEl.value);
+        const s = document.getElementById('logStatus');
+        if (s) { s.textContent = '✓ Saved'; setTimeout(() => s.textContent = '', 2000); }
+      }, 500);
+    });
+  }
+
+  // Drop zone
+  const dz = document.getElementById('dropZone');
+  if (dz) {
+    dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('dragover'); });
+    dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
+    dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('dragover'); dz.textContent = `📎 ${e.dataTransfer.files.length} file(s) ready — upload feature coming soon`; });
+  }
+}
+
+window.saveCN = function(el){
+  localStorage.setItem(`claim_note_${el.dataset.claim}`, el.value);
+};
+
+init();
+})();
+</script>
+</body>
+</html>
